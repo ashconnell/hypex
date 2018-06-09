@@ -4,7 +4,7 @@ Important: this is a WIP and isn't published to npm yet, i'm just testing the wa
 
 ## Build your store
 
-```
+```javascript
 // store.js
 import { schema, types } from 'mobx-quantum'
 import actions from './actions'
@@ -26,7 +26,7 @@ export default createStore(Store, {
 
 ## Define the actions for your store
 
-```
+```javascript
 // actions.js
 import { flow } from 'mobx-quantum'
 import api from './api'
@@ -48,13 +48,13 @@ export default {
 
 ## Define side effects
 
-```
+```javascript
 TODO (no pun intended)
 ```
 
 ## Wrap your app with Provider
 
-```
+```javascript
 // index.js
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -73,7 +73,7 @@ ReactDOM.render(<App />, document.getElementById('root'));
 
 ## Wrap components with inject
 
-```
+```javascript
 // Todos.js
 import { injectStore } from 'mobx-quantum'
 
