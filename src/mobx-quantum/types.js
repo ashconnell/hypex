@@ -10,6 +10,7 @@ export const Types = {
   ENUM: 'enum',
   MODEL: 'model',
   MIXED: 'mixed',
+  VIRTUAL: 'virtual',
 }
 
 class Type {
@@ -19,6 +20,7 @@ class Type {
     this.enum = options.enum // ENUM
     this.schema = options.schema // MODEL (might be fn)
     this.of = options.of // ARRAY
+    this.value = options.value // VIRTUAL
   }
 }
 

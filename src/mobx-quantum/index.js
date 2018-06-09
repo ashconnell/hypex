@@ -260,6 +260,14 @@ function registerSchema(schema, actions) {
         })
         decorate(Model, { [prop]: computed })
         break
+      case Types.VIRTUAL:
+        Object.defineProperty(Model.prototype, prop, {
+          enumerable: true,
+          configurable: true,
+          get: type.value,
+        })
+        decorate(Model, { [prop]: computed })
+        break
       default:
         break
     }
