@@ -1,8 +1,8 @@
-export { flow } from "mobx";
+export { flow } from 'mobx'
 
 const delay = ms =>
   new Promise((resolve, reject) => {
-    setTimeout(resolve, ms);
-  });
+    setTimeout(resolve, ms)
+  })
 
-export { delay };
+export { delay }

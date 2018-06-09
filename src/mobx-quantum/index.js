@@ -1,11 +1,8 @@
 import {
-  get,
-  set,
   intercept,
   autorun,
   extendObservable,
   computed,
-  toJS,
   action,
   configure,
   decorate,
@@ -17,7 +14,7 @@ import { Types } from './types'
 import serialize from './serialize'
 export { default as types } from './types'
 
-configure({ enforceActions: false })
+configure({ enforceActions: true })
 
 const schemas = {}
 
@@ -34,65 +31,64 @@ class Schema {
 }
 
 function registerSchema(schema, actions) {
-  if (isFunction(schema)) {
-    schema = schema()
-  }
   if (schemas[schema.name]) {
     return schemas[schema.name]
   }
+  schemas[schema.name] = schema
   class Model {
-    $ = {
-      ids: new Map(),
-    }
+    _schema = schema
+    _interceptors = {}
+    _id
+    _ids = {}
+    _models = {}
+
     constructor({ store, data, onSnapshot, actions }) {
       if (!data) data = {}
-      this.$disposers = {}
-      this.$.schema = schema
-      this.$.ids = new Map()
-      this.$.isStore = !store
-      this.$.store = store || this
-      this.$.disposers = {}
-      if (this.$.isStore) {
-        this.$.models = observable(new Map())
-        this.actions = {}
+      this._isStore = !store
+      this._store = store || this
+      if (this._isStore) {
         each(actions, (method, name) => {
-          this[name] = function(...args) {
-            method(this)(...args)
-          }
-          decorate(this, { [name]: action })
+          extendObservable(
+            this,
+            {
+              [name]: (...args) => method(this)(...args),
+            },
+            {
+              [name]: action,
+            }
+          )
         })
       }
       this.set(data)
-      this.$.store.register(this)
-      if (this.$.isStore) {
+      this._store.register(this)
+      if (this._isStore) {
         autorun(() => {
           let snapshot = serialize(this)
-          // console.log(this);
           onSnapshot && onSnapshot(snapshot)
         })
       }
     }
     set(data) {
-      if (this.$.isStore) {
-        each(data.$models, (data, id) => {
-          let schema = schemas[data.$type]
+      if (this._isStore) {
+        each(data._models, (data, id) => {
+          let schema = schemas[data._type]
           let model = new schema.Model({
             store: this,
             data,
           })
-          set(this.$.models, model.$.id, model)
+          this._models[model._id] = model
         })
       }
-      each(this.$.schema.props, (type, prop) => {
+      each(this._schema.props, (type, prop) => {
         const defaultValue = isFunction(type.default)
           ? type.default()
           : type.default
         const value = data[prop] || defaultValue
-        if (this.$.disposers[prop]) this.$.disposers[prop]()
+        if (this._interceptors[prop]) this._interceptors[prop]()
         switch (type.name) {
           case Types.ID:
-            this.$.disposers[prop] = intercept(this, prop, change => {
-              this.$.id = change.newValue || cuid()
+            this._interceptors[prop] = intercept(this, prop, change => {
+              this._id = change.newValue || cuid()
               return change
             })
             this[prop] = value
@@ -102,14 +98,8 @@ function registerSchema(schema, actions) {
           case Types.BOOLEAN:
           case Types.DATE:
           case Types.ENUM:
-            this[prop] = value
-            break
           case Types.MIXED:
-            this[prop] = value
-            break
           case Types.ARRAY:
-            this[prop] = value
-            break
           case Types.MODEL:
             this[prop] = value
             break
@@ -117,15 +107,15 @@ function registerSchema(schema, actions) {
             break
         }
       })
-      if (!this.$.id) this.$.id = cuid()
+      if (!this._id) this._id = data._id || cuid()
     }
     register(model) {
-      if (!this.$.isStore) throw new Error('must register on a store')
+      if (!this._isStore) throw new Error('must register on a store')
       if (model === this) return
-      set(this.$.models, model.$.id, model)
+      this._models[model._id] = model
     }
     resolveId(schema, data) {
-      const store = this.$.store
+      const store = this._store
       /**
        * data could be:
        * - an id (string/number)
@@ -138,12 +128,9 @@ function registerSchema(schema, actions) {
       if (isString(data) || isNumber(data)) {
         return data
       }
-      if (isFunction(schema)) {
-        schema = schema()
-      }
       // model
       if (data instanceof schema.Model) {
-        return data.$.id
+        return data._id
       }
       // object without id
       const id = data[schema.idKey]
@@ -152,23 +139,24 @@ function registerSchema(schema, actions) {
           store,
           data,
         })
-        set(store.$.models, model.$.id, model)
-        return model.$.id
+        store._models[model._id] = model
+        return model._id
       }
       // object with id
-      let model = get(store.$.models, id)
+      let model = store._models[id]
       if (!model) {
         model = new schema.Model({
           store,
           data,
         })
-        set(store.$.models, model.$.id, model)
+        store._models[model._id] = model
       }
-      return model.$.id
+      return model._id
     }
     get(id) {
-      const store = this.$.store
-      return get(store.$.models, id) || id
+      const store = this._store
+      const model = store._models[id]
+      return model || id
     }
   }
   Object.defineProperty(Model, 'name', {
@@ -176,10 +164,11 @@ function registerSchema(schema, actions) {
     writable: false,
   })
   decorate(Model, {
-    $: observable,
+    _id: observable,
+    _ids: observable,
+    _models: observable,
   })
   schema.Model = Model
-  schemas[schema.name] = schema
   each(schema.props, (type, prop) => {
     switch (type.name) {
       case Types.ID:
@@ -201,7 +190,7 @@ function registerSchema(schema, actions) {
           enumerable: true,
           configurable: true,
           set: function(data) {
-            // console.log(`set ${this.$.id}.${prop}`, data);
+            // console.log(`set ${this._id}.${prop}`, data);
             /**
              * data could be an array of any:
              * - id (string/number)
@@ -209,38 +198,31 @@ function registerSchema(schema, actions) {
              * - plain object
              */
             if (!data) {
-              set(this.$.ids, prop, null)
-              return
-            }
-            let ids = observable(
-              data.map(child => {
+              this._ids[prop] = null
+            } else {
+              let ids = data.map(child => {
                 return this.resolveId(type.of.schema, child)
               })
-            )
-            set(this.$.ids, prop, ids)
-            console.log('>>> 1')
+              this._ids[prop] = ids
+            }
           },
           get: function() {
-            // console.log(`get ${this.$.id}.${prop}`);
-            let ids = get(this.$.ids, prop)
+            let ids = this._ids[prop]
             if (!ids) return null
-            // ids = observable(ids.map(id => this.get(id)));
             ids = observable(ids.map(id => this.get(id)))
             const disposeKey = `${prop}Val`
-            if (this.$disposers[disposeKey]) this.$disposers[disposeKey]()
-            this.$disposers[disposeKey] = intercept(ids, change => {
-              console.log('>>> 2')
-              // console.log(`splice ${this.$.id}.${prop}`, change);
+            if (this._interceptors[disposeKey]) this._interceptors[disposeKey]()
+            this._interceptors[disposeKey] = intercept(ids, change => {
               switch (change.type) {
                 case 'splice':
                   const ids = change.added.map(value => {
                     return this.resolveId(type.of.schema, value)
                   })
-                  // get(this.$.ids, prop).splice(
-                  //   change.index,
-                  //   change.removedCount,
-                  //   ...ids
-                  // );
+                  this._ids[prop].splice(
+                    change.index,
+                    change.removedCount,
+                    ...ids
+                  )
                   break
                 default:
                   break
@@ -264,11 +246,15 @@ function registerSchema(schema, actions) {
              * - a model
              * - a plain object
              */
-            const id = this.resolveId(type.schema, data)
-            set(this.$.ids, prop, id)
+            if (!data) {
+              this._ids[prop] = null
+            } else {
+              const id = this.resolveId(type.schema, data)
+              this._ids[prop] = id
+            }
           },
           get: function() {
-            const id = get(this.$.ids, prop)
+            const id = this._ids[prop]
             return this.get(id)
           },
         })
@@ -281,9 +267,29 @@ function registerSchema(schema, actions) {
   return schema
 }
 
+const loadCircularSchemaRefs = schema => {
+  each(schema.props, (type, prop) => {
+    if (type.schema) {
+      if (isFunction(type.schema)) type.schema = type.schema()
+      loadCircularSchemaRefs(type.schema)
+    }
+    if (type.of && type.of.schema) {
+      if (isFunction(type.of.schema)) type.of.schema = type.of.schema()
+      loadCircularSchemaRefs(type.of.schema)
+    }
+  })
+}
+
 export function createStore(schema, { snapshot, onSnapshot, actions }) {
+  if (isFunction(snapshot)) snapshot = snapshot()
+  loadCircularSchemaRefs(schema)
+  console.time('[quantum] built schemas')
   const Store = registerSchema(schema).Model
-  return new Store({ data: snapshot, onSnapshot, actions })
+  console.timeEnd('[quantum] built schemas')
+  console.time('[quantum] built store')
+  const store = new Store({ data: snapshot, onSnapshot, actions })
+  console.timeEnd('[quantum] built store')
+  return store
 }
 
 export function schema(name, props) {
