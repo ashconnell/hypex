@@ -16,8 +16,6 @@ export { default as types } from './types'
 
 configure({ enforceActions: true })
 
-const schemas = {}
-
 class Schema {
   constructor(name, props) {
     this.name = name
@@ -30,11 +28,8 @@ class Schema {
   }
 }
 
-function registerSchema(schema, actions) {
-  if (schemas[schema.name]) {
-    return schemas[schema.name]
-  }
-  schemas[schema.name] = schema
+function buildModel(schema, schemas) {
+  if (schema.Model) return
   class Model {
     _schema = schema
     _interceptors = {}
@@ -186,9 +181,6 @@ function registerSchema(schema, actions) {
         decorate(Model, { [prop]: observable })
         break
       case Types.ARRAY:
-        if (type.of.name === Types.MODEL) {
-          registerSchema(type.of.schema)
-        }
         Object.defineProperty(Model.prototype, prop, {
           enumerable: true,
           configurable: true,
@@ -238,7 +230,6 @@ function registerSchema(schema, actions) {
         decorate(Model, { [prop]: computed })
         break
       case Types.MODEL:
-        registerSchema(type.schema)
         Object.defineProperty(Model.prototype, prop, {
           enumerable: true,
           configurable: true,
@@ -275,30 +266,45 @@ function registerSchema(schema, actions) {
         break
     }
   })
-  return schema
+  // return schema
 }
 
-const loadCircularSchemaRefs = schema => {
+function registerSchemas(schema, schemas = {}) {
+  if (schemas[schema.name]) return
+  // load circular schema refs
   each(schema.props, (type, prop) => {
-    if (type.schema) {
-      if (isFunction(type.schema)) type.schema = type.schema()
-      loadCircularSchemaRefs(type.schema)
+    if (isFunction(type.schema)) {
+      type.schema = type.schema()
     }
-    if (type.of && type.of.schema) {
-      if (isFunction(type.of.schema)) type.of.schema = type.of.schema()
-      loadCircularSchemaRefs(type.of.schema)
+    if (type.of && isFunction(type.of.schema)) {
+      type.of.schema = type.of.schema()
     }
   })
+  // pre-register
+  schemas[schema.name] = schema
+  // register child schemas
+  each(schema.props, (type, prop) => {
+    if (type.name === Types.MODEL) {
+      registerSchemas(type.schema, schemas)
+    }
+    if (type.name === Types.ARRAY && type.of.name === Types.MODEL) {
+      registerSchemas(type.of.schema, schemas)
+    }
+  })
+  return schemas
 }
 
 export function createStore(schema, { snapshot, onChange, actions }) {
   if (isFunction(snapshot)) snapshot = snapshot()
-  loadCircularSchemaRefs(schema)
   console.time('[quantum] built schemas')
-  const Store = registerSchema(schema).Model
+  const schemas = registerSchemas(schema)
   console.timeEnd('[quantum] built schemas')
+  console.time('[quantum] built models')
+  each(schemas, schema => buildModel(schema, schemas))
+  console.timeEnd('[quantum] built models')
+  // console.log({ schemas })
   console.time('[quantum] built store')
-  const store = new Store({ data: snapshot, onChange, actions })
+  const store = new schema.Model({ data: snapshot, onChange, actions })
   console.timeEnd('[quantum] built store')
   return store
 }
