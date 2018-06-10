@@ -43,6 +43,8 @@ const serialize = createTransformer(model => {
         break
       case Types.VIRTUAL:
         break
+      default:
+        break
     }
   })
   if (model._isStore) {
@@ -90,6 +92,8 @@ const toJS = createTransformer(model => {
         data[prop] = toJS(model._store.get(model._ids[prop]))
         break
       case Types.VIRTUAL:
+        break
+      default:
         break
     }
   })

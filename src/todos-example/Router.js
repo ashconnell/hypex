@@ -9,7 +9,6 @@ const components = {
 }
 
 const Router = ({ store }) => {
-  console.log('[Router]', store.route)
   if (!store.route) return null
   const Route = components[store.route.name]
   return <Route {...store.route.props} />

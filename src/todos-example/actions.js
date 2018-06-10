@@ -1,4 +1,4 @@
-import { times, remove } from 'lodash'
+import { times } from 'lodash'
 import { flow, delay } from '../mobx-quantum/effects'
 import cuid from 'cuid'
 
@@ -34,20 +34,20 @@ const fetchTodoLists = store =>
       ],
     })
 
-    // yield delay(500) // simulate async
-    // var amount = 1000
-    // var action = `create ${amount} todos`
-    // console.time(action)
-    // let todos = []
-    // times(amount, i => {
-    //   todos.push({ id: `gt${i}`, text: `Todo #${i}`, complete: false })
-    // })
-    // store.todoLists.push({
-    //   id: 'tl3',
-    //   name: 'Massive',
-    //   todos,
-    // })
-    // console.timeEnd(action)
+    yield delay(500) // simulate async
+    var amount = 1000
+    var action = `create ${amount} todos`
+    console.time(action)
+    let todos = []
+    times(amount, i => {
+      todos.push({ id: `gt${i}`, text: `Todo #${i}`, complete: false })
+    })
+    store.todoLists.push({
+      id: 'tl3',
+      name: 'Massive',
+      todos,
+    })
+    console.timeEnd(action)
   })
 
 const createNewList = store => () => {
