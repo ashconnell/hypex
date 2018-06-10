@@ -89,3 +89,39 @@ const Todos = (store) => (
 
 export default injectStore(Todos)
 ```
+
+## Types
+
+Use Types to define the properties on a schema.
+
+The following types are available:
+
+| Type | Note |
+|---|---|
+| string | A string primitive |
+| number | A number primitive |
+| boolean | A boolean primitive |
+| date | A javascript Date. This will be converted to ISOString in snapshots |
+| array | An array of types |
+| model | A reference to another model |
+| id | Marks the id property of a model (max 1 per model) |
+| enum | Defines string enumerator values |
+| mixed | An object where the keys vary or are unknown |
+| virtual | A derived value from other properties on the model |
+
+Types are created by passing in options:
+
+| Option | Description | Example |
+|---|---|---|
+| default | If no value is provided for this prop, it will use this value. Can be a function if you need to generate values. | `types.string({ default: 'Foobars' })` |
+| schema | Used for types.model to reference the target schema. Can be a function to make circular references. | `types.model({ schema: Todo })` |
+| of | Used for types.array to specify the type of the array items. | `types.array({ of: types.model({ schema: Todo }) })` |
+| value | Used for types.virtual to specify the value of the virtual. | `types.virtual({ value: function () { return this.cost * this.amount }})` |
+
+You can use certain options together to form things like:
+
+```javascript
+const Store = schema('Store', {
+  todos: types.array({ of: types.model({ schema: Todo }), default: [] }),
+})
+```

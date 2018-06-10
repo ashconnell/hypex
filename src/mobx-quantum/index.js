@@ -269,7 +269,7 @@ function buildModel(schema, schemas) {
   // return schema
 }
 
-function registerSchemas(schema, schemas = {}) {
+function resolveSchema(schema, schemas = {}) {
   if (schemas[schema.name]) return
   // load circular schema refs
   each(schema.props, (type, prop) => {
@@ -285,10 +285,10 @@ function registerSchemas(schema, schemas = {}) {
   // register child schemas
   each(schema.props, (type, prop) => {
     if (type.name === Types.MODEL) {
-      registerSchemas(type.schema, schemas)
+      resolveSchema(type.schema, schemas)
     }
     if (type.name === Types.ARRAY && type.of.name === Types.MODEL) {
-      registerSchemas(type.of.schema, schemas)
+      resolveSchema(type.of.schema, schemas)
     }
   })
   return schemas
@@ -297,7 +297,7 @@ function registerSchemas(schema, schemas = {}) {
 export function createStore(schema, { snapshot, onChange, actions }) {
   if (isFunction(snapshot)) snapshot = snapshot()
   console.time('[quantum] built schemas')
-  const schemas = registerSchemas(schema)
+  const schemas = resolveSchema(schema)
   console.timeEnd('[quantum] built schemas')
   console.time('[quantum] built models')
   each(schemas, schema => buildModel(schema, schemas))
