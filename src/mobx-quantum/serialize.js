@@ -3,6 +3,15 @@ import { values } from 'mobx'
 import { Types } from './types'
 import { createTransformer } from 'mobx-utils'
 
+/**
+ * serialize outputs a normalized data snapshot
+ * useful for storing in localStorage/AsyncStorage
+ * etc for re-hydrating the store.
+ *
+ * A snapshot is basically a single map of
+ * `{ [id]: model }` and models without ids
+ * are assigned one behind the scenes
+ */
 const serialize = createTransformer(model => {
   let data = {}
   if (!model._isStore) {
@@ -45,6 +54,14 @@ const serialize = createTransformer(model => {
   return data
 })
 
+/**
+ * toJS outputs exactly what you would expect
+ * after building your store schema.
+ * Cyclical references are kept intact.
+ * This should be used to inspect the state of
+ * your store, and should not be put into
+ * localStorage/AsyncStorage etc
+ */
 const toJS = createTransformer(model => {
   let data = {}
   each(model._schema.props, (type, prop) => {
