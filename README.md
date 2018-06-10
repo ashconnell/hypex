@@ -1,5 +1,13 @@
 # Mobx Quantum
 
+Mobx Quantum is inspired by the great [mobx-state-tree](https://github.com/mobxjs/mobx-state-tree) project!
+
+The overall goal of Mobx Quantum is to create a super simple state management library by combining popular paradigms introduced across the community from other libraries.
+
+- Mobx5: Observables, proxies and computed values remove the need to manually deal with immutability
+- Redux/Flux: Single-state-atoms and global actions make it easy to debug and track how your application changes
+- Redux-Saga: Side-effects using generators unlock powerful application daemons and handlers
+
 Important: this is a WIP and isn't published to npm yet, i'm just testing the waters. 
 
 ## Build your store
