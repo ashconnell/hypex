@@ -1,5 +1,5 @@
 import { each } from 'lodash'
-import { get } from 'mobx'
+import { values } from 'mobx'
 import { Types } from './types'
 import { createTransformer } from 'mobx-utils'
 
@@ -24,9 +24,9 @@ const serializeModel = createTransformer(model => {
         break
       case Types.ARRAY:
         if (type.of.name === Types.MODEL) {
-          data[prop] = get(model._ids, prop).slice()
+          data[prop] = values(model._ids[prop])
         } else {
-          data[prop] = value.slice()
+          data[prop] = values(value)
         }
         break
       case Types.MODEL:
