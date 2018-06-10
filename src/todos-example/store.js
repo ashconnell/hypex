@@ -38,8 +38,8 @@ const store = createStore(Store, {
     console.log('loaded snapshot', snapshot)
     return snapshot
   },
-  onSnapshot: (snapshot, js) => {
-    console.log('onSnapshot', snapshot)
+  onChange: ({ snapshot, js }) => {
+    console.log('onChange', js)
     localStorage.setItem('snapshot', JSON.stringify(snapshot))
   },
   actions,

@@ -11,7 +11,7 @@ import {
 import { each, isString, isNumber, isFunction } from 'lodash'
 import cuid from 'cuid'
 import { Types } from './types'
-import serialize from './serialize'
+import { serialize, toJS } from './serialize'
 export { default as types } from './types'
 
 configure({ enforceActions: true })
@@ -42,7 +42,7 @@ function registerSchema(schema, actions) {
     _ids = {}
     _models = {}
 
-    constructor({ store, data, onSnapshot, actions }) {
+    constructor({ store, data, onChange, actions }) {
       if (!data) data = {}
       this._isStore = !store
       this._store = store || this
@@ -63,8 +63,11 @@ function registerSchema(schema, actions) {
       this._store.register(this)
       if (this._isStore) {
         autorun(() => {
+          console.time('onChange')
           let snapshot = serialize(this)
-          onSnapshot && onSnapshot(snapshot)
+          let js = toJS(this)
+          console.timeEnd('onChange')
+          onChange && onChange({ snapshot, js })
         })
       }
     }
@@ -288,14 +291,14 @@ const loadCircularSchemaRefs = schema => {
   })
 }
 
-export function createStore(schema, { snapshot, onSnapshot, actions }) {
+export function createStore(schema, { snapshot, onChange, actions }) {
   if (isFunction(snapshot)) snapshot = snapshot()
   loadCircularSchemaRefs(schema)
   console.time('[quantum] built schemas')
   const Store = registerSchema(schema).Model
   console.timeEnd('[quantum] built schemas')
   console.time('[quantum] built store')
-  const store = new Store({ data: snapshot, onSnapshot, actions })
+  const store = new Store({ data: snapshot, onChange, actions })
   console.timeEnd('[quantum] built store')
   return store
 }
