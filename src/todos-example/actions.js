@@ -22,6 +22,7 @@ const fetchTodoLists = store =>
         flags: ['lol', 'bars'],
       },
     ]
+
     yield delay(500) // simulate async
     store.todoLists.push({
       id: 'tl2',
@@ -32,21 +33,21 @@ const fetchTodoLists = store =>
         { id: 't2', text: 'Get bread', complete: true },
       ],
     })
-    yield delay(500) // simulate async
-    var amount = 1000
-    var action = `create ${amount} todos`
-    console.time(action)
-    let todos = []
-    times(amount, i => {
-      todos.push({ id: `gt${i}`, text: `Todo #${i}`, complete: false })
-    })
-    store.todoLists.push({
-      id: 'tl3',
-      name: 'Massive',
-      todos,
-    })
-    console.timeEnd(action)
-    // console.log("g", store.todoLists.slice());
+
+    // yield delay(500) // simulate async
+    // var amount = 1000
+    // var action = `create ${amount} todos`
+    // console.time(action)
+    // let todos = []
+    // times(amount, i => {
+    //   todos.push({ id: `gt${i}`, text: `Todo #${i}`, complete: false })
+    // })
+    // store.todoLists.push({
+    //   id: 'tl3',
+    //   name: 'Massive',
+    //   todos,
+    // })
+    // console.timeEnd(action)
   })
 
 const createNewList = store => () => {

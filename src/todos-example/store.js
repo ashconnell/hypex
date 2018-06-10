@@ -11,7 +11,6 @@ const TodoList = schema('TodoList', {
   id: types.id(),
   name: types.string(),
   todos: types.array({ of: types.model({ schema: () => Todo }), default: [] }),
-  tags: types.array({ of: types.string(), default: [] }),
   newTodo: types.string({ default: '' }),
   completed: types.virtual({
     value: function() {

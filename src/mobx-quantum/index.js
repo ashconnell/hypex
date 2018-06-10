@@ -107,7 +107,7 @@ function registerSchema(schema, actions) {
             break
         }
       })
-      if (!this._id) this._id = data._id || cuid()
+      if (!this._isStore && !this._id) this._id = data._id || cuid()
     }
     register(model) {
       if (!this._isStore) throw new Error('must register on a store')

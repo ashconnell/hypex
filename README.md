@@ -78,8 +78,12 @@ ReactDOM.render(<App />, document.getElementById('root'));
 import { injectStore } from 'mobx-quantum'
 
 const Todos = (store) => (
+  <h1>Todos</h1>
+  <form onSubmit={(e) => { e.preventDefault(); store.addTodo(this.text) }}>
+    <input type='text' placeholder='Add todo' onChange={(e) => this.text = e.target.value}/>
+  </form>
   {store.todos.map(todo => {
-    <p>todo.text</p>
+    <p>{todo.text}</p>
   })}
 )
 
