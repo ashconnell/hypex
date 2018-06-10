@@ -88,7 +88,7 @@ function registerSchema(schema, actions) {
         switch (type.name) {
           case Types.ID:
             this._interceptors[prop] = intercept(this, prop, change => {
-              this._id = change.newValue || cuid()
+              this._id = change.newValue || cuid.slug()
               return change
             })
             this[prop] = value
@@ -107,7 +107,7 @@ function registerSchema(schema, actions) {
             break
         }
       })
-      if (!this._isStore && !this._id) this._id = data._id || cuid()
+      if (!this._isStore && !this._id) this._id = data._id || cuid.slug()
     }
     register(model) {
       if (!this._isStore) throw new Error('must register on a store')
