@@ -11,6 +11,12 @@ Mobx Quantum is a light-weight wrapper around Mobx 5 that aims to:
 
 **Important***: this is currently a WIP and not ready for production (yet!)
 
+## Installation
+
+```
+yarn add mobx-quantum
+```
+
 ## Store
 
 The store is a single tree of data. You define how it looks using `schemas`. Schemas help to reconcile the types of data you insert into your store.
