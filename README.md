@@ -142,6 +142,20 @@ const Todos = (store) => (
 export default inject('store')(observer(Todos))
 ```
 
+## Example
+
+See `packages/example-todos` folder for a functional demo build using create-react-app.
+
+## Development
+
+After cloning the repo you can get a webpack build in watch-mode by running
+
+```
+cd packages/mobx-quantum
+yarn
+yarn start
+``
+
 # Thanks
 
 This library is very much inspired by some of the most amazing libraries in the community: [mobx](https://github.com/mobxjs/mobx), [mobx-state-tree](https://github.com/mobxjs/mobx-state-tree), [redux](https://github.com/reduxjs/redux), [redux-saga](https://github.com/redux-saga/redux-saga)
