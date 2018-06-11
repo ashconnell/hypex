@@ -13,6 +13,7 @@ import cuid from 'cuid'
 import { Types } from './types'
 import { serialize, toJS } from './serialize'
 export { default as types } from './types'
+export * from './effects'
 
 configure({ enforceActions: true })
 

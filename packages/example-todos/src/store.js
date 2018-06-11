@@ -1,4 +1,4 @@
-import { schema, types, createStore } from '../mobx-quantum'
+import { schema, types, createStore } from 'mobx-quantum'
 import actions from './actions'
 
 const Todo = schema('Todo', {

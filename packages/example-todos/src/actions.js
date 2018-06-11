@@ -1,5 +1,5 @@
 import { times } from 'lodash'
-import { flow, delay } from '../mobx-quantum/effects'
+import { flow, delay } from 'mobx-quantum'
 import cuid from 'cuid'
 
 const routeTo = store => (name, props) => {
