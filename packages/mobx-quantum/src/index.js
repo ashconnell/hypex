@@ -60,10 +60,10 @@ function buildModel(schema, schemas) {
       if (this._isStore) {
         autorun(() => {
           console.time('onChange')
-          let snapshot = serialize(this)
-          let js = toJS(this)
+          this._snapshot = serialize(this)
+          this._js = toJS(this)
           console.timeEnd('onChange')
-          onChange && onChange({ snapshot, js })
+          onChange && onChange({ snapshot: this._snapshot, js: this._js })
         })
       }
     }
@@ -143,7 +143,9 @@ function buildModel(schema, schemas) {
       }
       // object with id
       let model = store._models[id]
-      if (!model) {
+      if (model) {
+        model.set(data)
+      } else {
         model = new schema.Model({
           store,
           data,
@@ -295,7 +297,8 @@ function resolveSchema(schema, schemas = {}) {
   return schemas
 }
 
-export function createStore(schema, { snapshot, onChange, actions }) {
+export function createStore(schema, options = {}) {
+  let { snapshot, onChange, actions } = options
   if (isFunction(snapshot)) snapshot = snapshot()
   console.time('[quantum] built schemas')
   const schemas = resolveSchema(schema)

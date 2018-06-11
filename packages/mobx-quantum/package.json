@@ -7,7 +7,8 @@
   "sideEffects": false,
   "scripts": {
     "start": "webpack --watch --config webpack.dev.babel.js",
-    "build": "webpack --config webpack.prod.babel.js"
+    "build": "webpack --config webpack.prod.babel.js",
+    "test": "jest --watch"
   },
   "peerDependencies": {
     "mobx": "^5.0.0"
@@ -21,11 +22,15 @@
     "babel-register": "^6.26.0",
     "clean-webpack-plugin": "^0.1.19",
     "cuid": "^2.1.1",
+    "jest": "^23.1.0",
     "lodash": "^4.17.10",
     "mobx": "^5.0.0",
     "mobx-utils": "^5.0.0",
     "webpack": "^4.12.0",
     "webpack-cli": "^3.0.3",
     "webpack-merge": "^4.1.2"
+  },
+  "jest": {
+    "testEnvironment": "node"
   }
 }
