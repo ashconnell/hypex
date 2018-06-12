@@ -5292,10 +5292,6 @@ mkdirp@0.5.1, mkdirp@0.5.x, mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@~0.5.0, mkdirp@
   dependencies:
     minimist "0.0.8"
 
-mobx-quantum@1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/mobx-quantum/-/mobx-quantum-1.0.0.tgz#94d685398c63a91b3b96db2a6416b9047f2a5fe8"
-
 mobx-react@^5.2.0:
   version "5.2.2"
   resolved "https://registry.yarnpkg.com/mobx-react/-/mobx-react-5.2.2.tgz#63a84b093e9a4facdcc5869c03d7db6406890e67"

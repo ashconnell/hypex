@@ -1,6 +1,6 @@
 import { each } from 'lodash'
 import { values } from 'mobx'
-import { Types } from './types'
+import { Props } from './props'
 import { createTransformer } from 'mobx-utils'
 
 /**
@@ -12,45 +12,45 @@ import { createTransformer } from 'mobx-utils'
  * `{ [id]: model }` and models without ids
  * are assigned one behind the scenes
  */
-const serialize = createTransformer(model => {
+const serialize = createTransformer(instance => {
   let data = {}
-  if (!model._isStore) {
-    data._type = model._schema.name
-    data._id = model._id
+  if (!instance._isStore) {
+    data._type = instance._model.name
+    data._id = instance._id
   }
-  each(model._schema.props, (type, prop) => {
-    const value = model[prop]
+  each(instance._model.props, (prop, key) => {
+    const value = instance[key]
     if (!value) return
-    switch (type.name) {
-      case Types.ID:
-      case Types.STRING:
-      case Types.NUMBER:
-      case Types.BOOLEAN:
-      case Types.DATE:
-      case Types.ENUM:
-      case Types.MIXED:
-        data[prop] = value
+    switch (prop.name) {
+      case Props.ID:
+      case Props.STRING:
+      case Props.NUMBER:
+      case Props.BOOLEAN:
+      case Props.DATE:
+      case Props.ENUM:
+      case Props.MIXED:
+        data[key] = value
         break
-      case Types.ARRAY:
-        if (type.of.name === Types.MODEL) {
-          data[prop] = values(model._ids[prop])
+      case Props.ARRAY:
+        if (prop.of.name === Props.REF) {
+          data[key] = values(instance._ids[key])
         } else {
-          data[prop] = values(value)
+          data[key] = values(value)
         }
         break
-      case Types.MODEL:
-        data[prop] = model._ids[prop]
+      case Props.REF:
+        data[key] = instance._ids[key]
         break
-      case Types.VIRTUAL:
+      case Props.VIRTUAL:
         break
       default:
         break
     }
   })
-  if (model._isStore) {
-    data._models = {}
-    each(model._models, (model, id) => {
-      data._models[id] = serialize(model)
+  if (instance._isStore) {
+    data._instances = {}
+    each(instance._instances, (instance, id) => {
+      data._instances[id] = serialize(instance)
     })
   }
   return data
@@ -64,34 +64,36 @@ const serialize = createTransformer(model => {
  * your store, and should not be put into
  * localStorage/AsyncStorage etc
  */
-const toJS = createTransformer(model => {
+const toJS = createTransformer(instance => {
   let data = {}
-  each(model._schema.props, (type, prop) => {
-    const value = model[prop]
+  each(instance._model.props, (prop, key) => {
+    const value = instance[key]
     if (!value) return
-    switch (type.name) {
-      case Types.ID:
-      case Types.STRING:
-      case Types.NUMBER:
-      case Types.BOOLEAN:
-      case Types.DATE:
-      case Types.ENUM:
-        data[prop] = value
+    switch (prop.name) {
+      case Props.ID:
+      case Props.STRING:
+      case Props.NUMBER:
+      case Props.BOOLEAN:
+      case Props.DATE:
+      case Props.ENUM:
+        data[key] = value
         break
-      case Types.MIXED:
-        data[prop] = { ...value }
+      case Props.MIXED:
+        data[key] = { ...value }
         break
-      case Types.ARRAY:
-        if (type.of.name === Types.MODEL) {
-          data[prop] = model._ids[prop].map(id => toJS(model._store.get(id)))
+      case Props.ARRAY:
+        if (prop.of.name === Props.REF) {
+          data[key] = instance._ids[key].map(id =>
+            toJS(instance._store.get(id))
+          )
         } else {
-          data[prop] = values(value)
+          data[key] = values(value)
         }
         break
-      case Types.MODEL:
-        data[prop] = toJS(model._store.get(model._ids[prop]))
+      case Props.REF:
+        data[key] = toJS(instance._store.get(instance._ids[key]))
         break
-      case Types.VIRTUAL:
+      case Props.VIRTUAL:
         break
       default:
         break

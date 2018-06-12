@@ -1,35 +1,35 @@
-import { schema, types, createStore } from 'mobx-quantum'
+import { model, props, createStore } from 'mobx-quantum'
 import actions from './actions'
 
-const Todo = schema('Todo', {
-  id: types.id(),
-  text: types.string(),
-  complete: types.boolean({ default: false }),
+const Todo = model('Todo', {
+  id: props.id(),
+  text: props.string(),
+  complete: props.boolean({ default: false }),
 })
 
-const TodoList = schema('TodoList', {
-  id: types.id(),
-  name: types.string(),
-  todos: types.array({ of: types.model({ schema: () => Todo }), default: [] }),
-  newTodo: types.string({ default: '' }),
-  completed: types.virtual({
+const TodoList = model('TodoList', {
+  id: props.id(),
+  name: props.string(),
+  todos: props.array({ of: props.ref({ model: () => Todo }), default: [] }),
+  newTodo: props.string({ default: '' }),
+  completed: props.virtual({
     value: function() {
       return this.todos.filter(todo => todo.complete).length
     },
   }),
 })
 
-const Route = schema('Route', {
-  name: types.string(),
-  props: types.mixed(),
+const Route = model('Route', {
+  name: props.string(),
+  props: props.mixed(),
 })
 
-const Store = schema('Store', {
-  newListName: types.string({ default: '' }),
-  todoLists: types.array({
-    of: types.model({ schema: TodoList }),
+const Store = model('Store', {
+  newListName: props.string({ default: '' }),
+  todoLists: props.array({
+    of: props.ref({ model: TodoList }),
   }),
-  route: types.model({ schema: Route, default: { name: 'TodoLists' } }),
+  route: props.ref({ model: Route, default: { name: 'TodoLists' } }),
 })
 
 const store = createStore(Store, {

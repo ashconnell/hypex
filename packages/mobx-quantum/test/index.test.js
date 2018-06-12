@@ -1,17 +1,17 @@
 import { configure, onReactionError } from 'mobx'
-import { schema, types, createStore } from '../src'
+import { model, props, createStore } from '../src'
 
 configure({ enforceActions: false })
 
-const Todo = schema('Todo', {
-  id: types.id(),
-  name: types.string(),
-  done: types.boolean({ default: false }),
+const Todo = model('Todo', {
+  id: props.id(),
+  name: props.string(),
+  done: props.boolean({ default: false }),
 })
 
-const Store = schema('Store', {
-  todoOne: types.model({ schema: Todo }),
-  todoTwo: types.model({ schema: Todo }),
+const Store = model('Store', {
+  todoOne: props.ref({ model: Todo }),
+  todoTwo: props.ref({ model: Todo }),
 })
 
 function newStore(snapshot) {
@@ -58,7 +58,7 @@ test('can hydrate and snapshot', () => {
   })
   expect(store._snapshot).toEqual({
     todoOne: '1',
-    _models: {
+    _instances: {
       '1': {
         id: '1',
         name: 'Todo #1',
