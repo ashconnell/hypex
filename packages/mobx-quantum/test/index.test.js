@@ -17,7 +17,7 @@ const Store = schema('Store', {
 function newStore(snapshot) {
   return createStore(Store, {
     snapshot,
-    onChange: ({ js }) => console.log(js),
+    // onChange: ({ js }) => console.log(js),
   })
 }
 
@@ -39,6 +39,18 @@ test('can link models using an id', () => {
   expect(store.todoOne.done).toEqual(true)
   expect(store.todoTwo.done).toEqual(true)
 })
+
+test('update all instances with the same id, by just inserting in one place', () => {
+  const store = newStore()
+  store.todoOne = store.todoTwo = { id: '1', name: 'Todo #1', done: false }
+  store.todoTwo = { id: '1', name: 'Updated', done: true }
+  expect(store.todoOne.name).toEqual('Updated')
+  expect(store.todoOne.done).toEqual(true)
+  expect(store.todoTwo.name).toEqual('Updated')
+  expect(store.todoTwo.done).toEqual(true)
+})
+
+// TODO: automatic id resolution to model
 
 test('can hydrate and snapshot', () => {
   const store = newStore({
