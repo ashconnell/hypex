@@ -1,6 +1,6 @@
 # React Integration
 
-Mobx Quantum works with the [mobx-react](https://github.com/mobxjs/mobx-react) library:
+You can integrate a Mobx Quantum store into a react app using [mobx-react](https://github.com/mobxjs/mobx-react):
 
 ## Provider
 
@@ -46,4 +46,6 @@ export default inject('store')(observer(Todos))
 ```
 {% endcode-tabs-item %}
 {% endcode-tabs %}
+
+
 

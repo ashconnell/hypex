@@ -1,8 +1,9 @@
 # Table of contents
 
-* [Overview](README.md)
+* [Mobx Quantum](README.md)
+* [Models](models.md)
+* [Values](props.md)
 * [Store](getting-started.md)
-* [Props](props.md)
 * [React Integration](react-integration.md)
-* [Todos Example](todos-example.md)
+* [Examples](todos-example.md)
 
