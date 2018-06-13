@@ -1,5 +1,3 @@
-# Read Me
-
 ![mobx quantum](.gitbook/assets/logo-text.png)
 
 **Important**: this is currently a WIP and not ready for production \(yet!\)
