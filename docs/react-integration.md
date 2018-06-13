@@ -20,7 +20,6 @@ const App = () => (
 )
 
 ReactDOM.render(<App />, document.getElementById('root'));
-
 ```
 {% endcode-tabs-item %}
 {% endcode-tabs %}
@@ -46,6 +45,4 @@ export default inject('store')(observer(Todos))
 ```
 {% endcode-tabs-item %}
 {% endcode-tabs %}
-
-
 

@@ -110,5 +110,3 @@ Example: `value.virtual({ value: function () { return this.price * this.amount }
 | --- | --- |
 | value | Function | The return value of the function is what the actual value will be on the model. `this` will be bound to the instance of the model. Required. |
 
-
-

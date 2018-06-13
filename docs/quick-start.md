@@ -2,7 +2,7 @@
 
 ## Overview
 
-Let's build a simple Todos app with local-storage persistence and hydration. 
+Let's build a simple Todos app with local-storage persistence and hydration.
 
 You can also jump straight into playing around with a live example on [this codesandbox](https://codesandbox.io/s/64647p41mk)
 

@@ -27,7 +27,8 @@ When creating a store, you can pass in options as the second parameter to do thi
 ```javascript
 export default createStore(Store, {
   snapshot: JSON.parse(localStorage.getItem('snapshot') || '{}'),
-  onChange: ({ snapshot }) => localStorage.setItem('snapshot', JSON.parse(snapshot))
+  onSnapshot: snapshot => localStorage.setItem('snapshot', JSON.stringify(snapshot)),
+  onChange: data => console.log('onChange', data)
 })
 ```
 
@@ -36,6 +37,4 @@ export default createStore(Store, {
 | snapshot | JSON, Function | Creates the store with data from a previous snapshot. If snapshot is a function it's return value will be used. If the function returns a promise the data that is resolved will be used. |
 | onSnapshot | Function\(snapshot\) | Triggered whenever the store data changes. Use this to persist snapshots of the store. Snapshots are created using a normalized map of model instances, if you want to debug or traverse the data use the `onChange`option. |
 | onChange | Function\(data\) | Triggered whenever the store data changes. The value provided is a proper javascript object representation of your store. Use this for debugging and traversing your store. If you want to persist your store use `onSnapshot`, because this data can contain cyclical references |
-
-
 
