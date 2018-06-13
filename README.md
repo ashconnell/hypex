@@ -8,7 +8,7 @@ Mobx Quantum is a state management library based on [Mobx](https://github.com/mo
 
 The true potential of Mobx Quantum is that after defining what your store looks like, you can use it like any other javascript object \(including cyclic references\) and receive a bunch of other super powers for free.
 
-[Quick Start](docs/quick-start.md) \| [Documentation](docs/models.md)
+[Quick Start](https://ashconnell.gitbook.io/mobx-quantum/quick-start) \| [Documentation](https://ashconnell.gitbook.io/mobx-quantum)
 
 ## Powerful Reconciliation
 
