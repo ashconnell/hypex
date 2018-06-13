@@ -1,6 +1,6 @@
 # Table of contents
 
-* [Mobx Quantum](README.md)
+* [Read Me](README.md)
 * [Models](models.md)
 * [Values](props.md)
 * [Store](getting-started.md)

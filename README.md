@@ -1,4 +1,6 @@
-# Mobx Quantum
+# Read Me
+
+![mobx quantum](.gitbook/assets/logo-text.png)
 
 **Important**: this is currently a WIP and not ready for production \(yet!\)
 
@@ -8,7 +10,7 @@ The true potential of Mobx Quantum is that after defining what your store looks 
 
 [Documentation](https://ashconnell.gitbook.io/mobx-quantum/)
 
-### Quick Start
+## Quick Start
 
 Let's build a todo list react app with localStorage persistence and rehydration...
 
