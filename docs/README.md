@@ -1,6 +1,6 @@
 # Table of contents
 
-* [Read Me](README.md)
+* [Read Me](../README.md)
 * [Quick Start](quick-start.md)
 * [Models](models.md)
 * [Values](values.md)
