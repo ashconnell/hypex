@@ -6,6 +6,8 @@ Mobx Quantum is state management library based on [Mobx](https://github.com/mobx
 
 The true potential of Mobx Quantum is that after defining what your store looks like, you can use it like any other javascript object \(including cyclic references\) and receive a bunch of other super powers for free.
 
+[Documentation](https://ashconnell.gitbook.io/mobx-quantum/)
+
 ### Quick Start
 
 Let's build a todo list react app with localStorage persistence and rehydration...
