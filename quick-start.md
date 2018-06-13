@@ -1,9 +1,3 @@
----
-description: >-
-  Let's build a todo list react app with localStorage persistence and
-  rehydration...
----
-
 # Quick Start
 
 ## Install Dependencies

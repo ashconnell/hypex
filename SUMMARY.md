@@ -3,8 +3,8 @@
 * [Read Me](README.md)
 * [Quick Start](quick-start.md)
 * [Models](models.md)
-* [Values](props.md)
-* [Store](getting-started.md)
+* [Values](values.md)
+* [Store](store.md)
 * [React Integration](react-integration.md)
-* [Examples](todos-example.md)
+* [Examples](examples.md)
 

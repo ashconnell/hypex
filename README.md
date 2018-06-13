@@ -1,8 +1,10 @@
+# Read Me
+
 ![mobx quantum](.gitbook/assets/logo-text.png)
 
 **Important**: this is currently a WIP and not ready for production \(yet!\)
 
-Mobx Quantum is state management library based on [Mobx](https://github.com/mobxjs/mobx). It provides a simple way to define a single state atom for your application by leveraging the power of mobx without actually needing to know how observables, classes, and interceptors etc work.
+Mobx Quantum is a state management library based on [Mobx](https://github.com/mobxjs/mobx). It provides a simple way to define a single state atom for your application, by leveraging the power of mobx without needing to know how observables, classes, and interceptors etc work.
 
 The true potential of Mobx Quantum is that after defining what your store looks like, you can use it like any other javascript object \(including cyclic references\) and receive a bunch of other super powers for free.
 
@@ -10,7 +12,7 @@ The true potential of Mobx Quantum is that after defining what your store looks 
 
 ## Powerful Reconciliation
 
-A Mobx Quantum store is able to reconcile and ensure that only one instance of a model with the same id can exist in the store at any time - automatically! 
+A Mobx Quantum store is able to reconcile and ensure that only one instance of a model with the same id can exist in the store at any time - automatically!
 
 Take this example:
 
@@ -35,5 +37,5 @@ console.log(store.selectedTodo.name === 'Get Nothing') // true
 
 ## Thanks
 
-This library is very much inspired by some of the most amazing libraries in the community: [mobx](https://github.com/mobxjs/mobx), [mobx-state-tree](https://github.com/mobxjs/mobx-state-tree), [redux](https://github.com/reduxjs/redux), and [redux-saga](https://github.com/redux-saga/redux-saga). 
+This library is very much inspired by some of the most amazing libraries in the community: [mobx](https://github.com/mobxjs/mobx), [mobx-state-tree](https://github.com/mobxjs/mobx-state-tree), [redux](https://github.com/reduxjs/redux), and [redux-saga](https://github.com/redux-saga/redux-saga).
 

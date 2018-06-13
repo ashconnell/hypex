@@ -23,7 +23,7 @@ const Book = model('Book', {
 })
 ```
 
-### Value Types
+## Value Types
 
 ### String
 
