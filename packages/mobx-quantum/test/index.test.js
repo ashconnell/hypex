@@ -1,4 +1,4 @@
-import { configure, onReactionError } from 'mobx'
+import { configure } from 'mobx'
 import { model, value, createStore } from '../src'
 
 configure({ enforceActions: false })

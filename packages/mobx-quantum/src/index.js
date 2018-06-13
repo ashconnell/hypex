@@ -8,12 +8,14 @@ import {
   decorate,
   observable,
 } from 'mobx'
-import { each, isString, isNumber, isFunction } from 'lodash'
+import { each, isString, isNumber, isFunction, includes } from 'lodash'
 import cuid from 'cuid'
 import { Values } from './value'
 import { toSnapshot, toJS } from './serializers'
 export { default as value } from './value'
 export * from './effects'
+import { invariant } from './utils'
+import config from './config'
 
 configure({ enforceActions: true })
 
@@ -99,10 +101,23 @@ function buildInstance(model, models) {
           case Values.NUMBER:
           case Values.BOOLEAN:
           case Values.DATE:
-          case Values.ENUM:
           case Values.MIXED:
           case Values.ARRAY:
           case Values.REF:
+            this[prop] = val
+            break
+          case Values.ENUM:
+            if (!config.prod) {
+              this._interceptors[prop] = intercept(this, prop, change => {
+                invariant(
+                  change.newValue && includes(value.enums, change.newValue),
+                  `received enum '${
+                    change.newValue
+                  }' but expected one of: ${value.enums.join(', ')}`
+                )
+                return change
+              })
+            }
             this[prop] = val
             break
           default:

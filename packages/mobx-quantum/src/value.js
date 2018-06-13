@@ -1,4 +1,5 @@
-import { each } from 'lodash'
+import { each, includes } from 'lodash'
+import { invariant } from './utils'
 
 export const Values = {
   ID: 'id',
@@ -17,10 +18,19 @@ class Value {
   constructor(type, options = {}) {
     this.type = type
     this.default = options.default // STRING, NUMBER, BOOLEAN, DATE, ENUM, MIXED
-    this.enum = options.enum // ENUM
+    this.enums = options.enums // ENUM
     this.model = options.model // REF
     this.of = options.of // ARRAY
     this.value = options.value // VIRTUAL
+    this.validate()
+  }
+  validate() {
+    if (this.type === Values.ENUM) {
+      invariant(
+        this.default && includes(this.enums, this.default),
+        'enum default value must be one of the enums specified'
+      )
+    }
   }
 }
 
