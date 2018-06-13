@@ -6,11 +6,11 @@ Let's build a simple Todos app with local-storage persistence and hydration.
 
 You can also jump straight into playing around with a live example on [this codesandbox](https://codesandbox.io/s/64647p41mk)
 
-## Install Dependencies
+## 1. Install Dependencies
 
 `yarn add mobx-quantum mobx-react mobx react react-dom`
 
-## Define the store
+## 2. Define the store
 
 ```javascript
 // store.js
@@ -33,7 +33,7 @@ export default createStore(Store, {
 })
 ```
 
-## Define some actions for the store
+## 3. Define some actions for the store
 
 ```javascript
 // actions.js
@@ -43,7 +43,7 @@ function addTodo (text) {
 export default { addTodo }
 ```
 
-## Create our todo list component
+## 4. Create our Todos component
 
 ```javascript
 // Todos.js
@@ -62,7 +62,7 @@ const Todos = ({ store }) => (
 export default inject('store')(observer(Todos))
 ```
 
-## Initialize the react app
+## 5. Initialize the React app
 
 ```javascript
 // index.js
