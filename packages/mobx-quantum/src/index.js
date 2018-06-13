@@ -59,12 +59,12 @@ function buildInstance(model, models) {
       this._store.register(this)
       if (this._isStore) {
         autorun(() => {
-          console.time('toSnapshot')
+          // console.time('toSnapshot')
           this._snapshot = toSnapshot(this)
-          console.timeEnd('toSnapshot')
-          console.time('toJS')
+          // console.timeEnd('toSnapshot')
+          // console.time('toJS')
           this._js = toJS(this)
-          console.timeEnd('toJS')
+          // console.timeEnd('toJS')
           onChange && onChange(this._js)
           onSnapshot && onSnapshot(this._snapshot)
         })
@@ -304,21 +304,21 @@ function resolveModelTree(model, models = {}) {
 export function createStore(model, options = {}) {
   let { snapshot, onSnapshot, onChange, actions } = options
   if (isFunction(snapshot)) snapshot = snapshot()
-  console.time('[quantum] built models')
+  // console.time('[quantum] built models')
   const models = resolveModelTree(model)
-  console.timeEnd('[quantum] built models')
-  console.time('[quantum] built models')
+  // console.timeEnd('[quantum] built models')
+  // console.time('[quantum] built models')
   each(models, model => buildInstance(model, models))
-  console.timeEnd('[quantum] built models')
+  // console.timeEnd('[quantum] built models')
   // console.log({ models })
-  console.time('[quantum] built store')
+  // console.time('[quantum] built store')
   const store = new model.Instance({
     data: snapshot,
     onSnapshot,
     onChange,
     actions,
   })
-  console.timeEnd('[quantum] built store')
+  // console.timeEnd('[quantum] built store')
   return store
 }
 
