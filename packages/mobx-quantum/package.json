@@ -1,6 +1,6 @@
 {
   "name": "mobx-quantum",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "main": "dist/mobx-quantum.js",
   "module": "lib/mobx-quantum.module.js",
   "license": "MIT",
