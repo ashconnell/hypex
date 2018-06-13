@@ -1,6 +1,6 @@
 import { each } from 'lodash'
 
-export const Props = {
+export const Values = {
   ID: 'id',
   STRING: 'string',
   NUMBER: 'number',
@@ -13,21 +13,21 @@ export const Props = {
   VIRTUAL: 'virtual',
 }
 
-class Prop {
-  constructor(name, options = {}) {
-    this.name = name
+class Value {
+  constructor(type, options = {}) {
+    this.type = type
     this.default = options.default // STRING, NUMBER, BOOLEAN, DATE, ENUM, MIXED
     this.enum = options.enum // ENUM
-    this.model = options.model // REF (might be fn)
+    this.model = options.model // REF
     this.of = options.of // ARRAY
     this.value = options.value // VIRTUAL
   }
 }
 
-const props = {}
+const value = {}
 
-each(Props, name => {
-  props[name] = options => new Prop(name, options)
+each(Values, type => {
+  value[type] = options => new Value(type, options)
 })
 
-export default props
+export default value

@@ -1,17 +1,17 @@
 import { configure, onReactionError } from 'mobx'
-import { model, props, createStore } from '../src'
+import { model, value, createStore } from '../src'
 
 configure({ enforceActions: false })
 
 const Todo = model('Todo', {
-  id: props.id(),
-  name: props.string(),
-  done: props.boolean({ default: false }),
+  id: value.id(),
+  name: value.string(),
+  done: value.boolean({ default: false }),
 })
 
 const Store = model('Store', {
-  todoOne: props.ref({ model: Todo }),
-  todoTwo: props.ref({ model: Todo }),
+  todoOne: value.ref({ model: Todo }),
+  todoTwo: value.ref({ model: Todo }),
 })
 
 function newStore(snapshot) {

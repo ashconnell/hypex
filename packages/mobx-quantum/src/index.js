@@ -10,12 +10,10 @@ import {
 } from 'mobx'
 import { each, isString, isNumber, isFunction } from 'lodash'
 import cuid from 'cuid'
-import { Props } from './props'
-import { serialize, toJS } from './serialize'
-export { default as props } from './props'
+import { Values } from './value'
+import { toSnapshot, toJS } from './serializers'
+export { default as value } from './value'
 export * from './effects'
-
-console.log('WTF')
 
 configure({ enforceActions: true })
 
@@ -23,9 +21,9 @@ class Model {
   constructor(name, props) {
     this.name = name
     this.props = props
-    each(props, (prop, key) => {
-      if (prop.name === Props.ID) {
-        this.idKey = key
+    each(props, (value, prop) => {
+      if (value.type === Values.ID) {
+        this.idProp = prop
       }
     })
   }
@@ -40,7 +38,7 @@ function buildInstance(model, models) {
     _ids = {}
     _instances = {}
 
-    constructor({ store, data, onChange, actions }) {
+    constructor({ store, data, onSnapshot, onChange, actions }) {
       if (!data) data = {}
       this._isStore = !store
       this._store = store || this
@@ -61,11 +59,14 @@ function buildInstance(model, models) {
       this._store.register(this)
       if (this._isStore) {
         autorun(() => {
-          console.time('onChange')
-          this._snapshot = serialize(this)
+          console.time('toSnapshot')
+          this._snapshot = toSnapshot(this)
+          console.timeEnd('toSnapshot')
+          console.time('toJS')
           this._js = toJS(this)
-          console.timeEnd('onChange')
-          onChange && onChange({ snapshot: this._snapshot, js: this._js })
+          console.timeEnd('toJS')
+          onChange && onChange(this._js)
+          onSnapshot && onSnapshot(this._snapshot)
         })
       }
     }
@@ -80,29 +81,29 @@ function buildInstance(model, models) {
           this._instances[instance._id] = instance
         })
       }
-      each(this._model.props, (prop, key) => {
-        const defaultValue = isFunction(prop.default)
-          ? prop.default()
-          : prop.default
-        const value = data[key] || defaultValue
-        if (this._interceptors[key]) this._interceptors[key]()
-        switch (prop.name) {
-          case Props.ID:
-            this._interceptors[key] = intercept(this, key, change => {
+      each(this._model.props, (value, prop) => {
+        const defaultVal = isFunction(value.default)
+          ? value.default()
+          : value.default
+        const val = data[prop] || defaultVal
+        if (this._interceptors[prop]) this._interceptors[prop]()
+        switch (value.type) {
+          case Values.ID:
+            this._interceptors[prop] = intercept(this, prop, change => {
               this._id = change.newValue || cuid.slug()
               return change
             })
-            this[key] = value
+            this[prop] = val
             break
-          case Props.STRING:
-          case Props.NUMBER:
-          case Props.BOOLEAN:
-          case Props.DATE:
-          case Props.ENUM:
-          case Props.MIXED:
-          case Props.ARRAY:
-          case Props.REF:
-            this[key] = value
+          case Values.STRING:
+          case Values.NUMBER:
+          case Values.BOOLEAN:
+          case Values.DATE:
+          case Values.ENUM:
+          case Values.MIXED:
+          case Values.ARRAY:
+          case Values.REF:
+            this[prop] = val
             break
           default:
             break
@@ -134,7 +135,7 @@ function buildInstance(model, models) {
         return data._id
       }
       // object without id
-      const id = data[model.idKey]
+      const id = data[model.idProp]
       if (!id) {
         let instance = new model.Instance({
           store,
@@ -172,21 +173,21 @@ function buildInstance(model, models) {
     _instances: observable,
   })
   model.Instance = Instance
-  each(model.props, (prop, key) => {
-    switch (prop.name) {
-      case Props.ID:
-      case Props.STRING:
-      case Props.NUMBER:
-      case Props.BOOLEAN:
-      case Props.DATE:
-      case Props.ENUM:
-        decorate(Instance, { [key]: observable })
+  each(model.props, (value, prop) => {
+    switch (value.type) {
+      case Values.ID:
+      case Values.STRING:
+      case Values.NUMBER:
+      case Values.BOOLEAN:
+      case Values.DATE:
+      case Values.ENUM:
+        decorate(Instance, { [prop]: observable })
         break
-      case Props.MIXED:
-        decorate(Instance, { [key]: observable })
+      case Values.MIXED:
+        decorate(Instance, { [prop]: observable })
         break
-      case Props.ARRAY:
-        Object.defineProperty(Instance.prototype, key, {
+      case Values.ARRAY:
+        Object.defineProperty(Instance.prototype, prop, {
           enumerable: true,
           configurable: true,
           set: function(data) {
@@ -198,27 +199,28 @@ function buildInstance(model, models) {
              * - plain object
              */
             if (!data) {
-              this._ids[key] = null
+              this._ids[prop] = null
             } else {
               let ids = data.map(child => {
-                return this.resolveId(prop.of.model, child)
+                return this.resolveId(value.of.model, child)
               })
-              this._ids[key] = ids
+              this._ids[prop] = ids
             }
           },
           get: function() {
-            let ids = this._ids[key]
+            let ids = this._ids[prop]
             if (!ids) return null
             ids = observable(ids.map(id => this.get(id)))
-            const disposeKey = `${key}Val`
-            if (this._interceptors[disposeKey]) this._interceptors[disposeKey]()
-            this._interceptors[disposeKey] = intercept(ids, change => {
+            const disposeProp = `${prop}Val`
+            if (this._interceptors[disposeProp])
+              this._interceptors[disposeProp]()
+            this._interceptors[disposeProp] = intercept(ids, change => {
               switch (change.type) {
                 case 'splice':
-                  const ids = change.added.map(value => {
-                    return this.resolveId(prop.of.model, value)
+                  const ids = change.added.map(data => {
+                    return this.resolveId(value.of.model, data)
                   })
-                  this._ids[key].splice(
+                  this._ids[prop].splice(
                     change.index,
                     change.removedCount,
                     ...ids
@@ -232,10 +234,10 @@ function buildInstance(model, models) {
             return ids
           },
         })
-        decorate(Instance, { [key]: computed })
+        decorate(Instance, { [prop]: computed })
         break
-      case Props.REF:
-        Object.defineProperty(Instance.prototype, key, {
+      case Values.REF:
+        Object.defineProperty(Instance.prototype, prop, {
           enumerable: true,
           configurable: true,
           set: function(data) {
@@ -246,26 +248,26 @@ function buildInstance(model, models) {
              * - a plain object
              */
             if (!data) {
-              this._ids[key] = null
+              this._ids[prop] = null
             } else {
-              const id = this.resolveId(prop.model, data)
-              this._ids[key] = id
+              const id = this.resolveId(value.model, data)
+              this._ids[prop] = id
             }
           },
           get: function() {
-            const id = this._ids[key]
+            const id = this._ids[prop]
             return this.get(id)
           },
         })
-        decorate(Instance, { [key]: computed })
+        decorate(Instance, { [prop]: computed })
         break
-      case Props.VIRTUAL:
-        Object.defineProperty(Instance.prototype, key, {
+      case Values.VIRTUAL:
+        Object.defineProperty(Instance.prototype, prop, {
           enumerable: true,
           configurable: true,
-          get: prop.value,
+          get: value.value,
         })
-        decorate(Instance, { [key]: computed })
+        decorate(Instance, { [prop]: computed })
         break
       default:
         break
@@ -277,30 +279,30 @@ function buildInstance(model, models) {
 function resolveModelTree(model, models = {}) {
   if (model[model.name]) return
   // load circular schema refs
-  each(model.props, (prop, key) => {
-    if (isFunction(prop.model)) {
-      prop.model = prop.model()
+  each(model.props, (value, prop) => {
+    if (isFunction(value.model)) {
+      value.model = value.model()
     }
-    if (prop.of && isFunction(prop.of.model)) {
-      prop.of.model = prop.of.model()
+    if (value.of && isFunction(value.of.model)) {
+      value.of.model = value.of.model()
     }
   })
   // pre-register
   models[model.name] = model
   // register child schemas
-  each(model.props, (prop, key) => {
-    if (prop.name === Props.REF) {
-      resolveModelTree(prop.model, models)
+  each(model.props, (value, prop) => {
+    if (value.type === Values.REF) {
+      resolveModelTree(value.model, models)
     }
-    if (prop.name === Props.ARRAY && prop.of.name === Props.REF) {
-      resolveModelTree(prop.of.model, models)
+    if (value.type === Values.ARRAY && value.of.type === Values.REF) {
+      resolveModelTree(value.of.model, models)
     }
   })
   return models
 }
 
 export function createStore(model, options = {}) {
-  let { snapshot, onChange, actions } = options
+  let { snapshot, onSnapshot, onChange, actions } = options
   if (isFunction(snapshot)) snapshot = snapshot()
   console.time('[quantum] built models')
   const models = resolveModelTree(model)
@@ -310,7 +312,12 @@ export function createStore(model, options = {}) {
   console.timeEnd('[quantum] built models')
   // console.log({ models })
   console.time('[quantum] built store')
-  const store = new model.Instance({ data: snapshot, onChange, actions })
+  const store = new model.Instance({
+    data: snapshot,
+    onSnapshot,
+    onChange,
+    actions,
+  })
   console.timeEnd('[quantum] built store')
   return store
 }

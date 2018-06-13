@@ -1,5 +1,6 @@
 import { times } from 'lodash'
-import { flow, delay } from 'mobx-quantum'
+import { delay } from 'mobx-quantum'
+import { flow } from 'mobx'
 import cuid from 'cuid'
 
 const routeTo = store => (name, props) => {
@@ -19,7 +20,6 @@ const fetchTodoLists = store =>
         id: 'tl1',
         name: 'Personal',
         todos: [{ id: 't1', text: 'Get milk', complete: false }],
-        flags: ['lol', 'bars'],
       },
     ]
 

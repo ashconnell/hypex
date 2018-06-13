@@ -1,18 +1,18 @@
-import { model, props, createStore } from 'mobx-quantum'
+import { model, value, createStore } from 'mobx-quantum'
 import actions from './actions'
 
 const Todo = model('Todo', {
-  id: props.id(),
-  text: props.string(),
-  complete: props.boolean({ default: false }),
+  id: value.id(),
+  text: value.string(),
+  complete: value.boolean({ default: false }),
 })
 
 const TodoList = model('TodoList', {
-  id: props.id(),
-  name: props.string(),
-  todos: props.array({ of: props.ref({ model: () => Todo }), default: [] }),
-  newTodo: props.string({ default: '' }),
-  completed: props.virtual({
+  id: value.id(),
+  name: value.string(),
+  todos: value.array({ of: value.ref({ model: () => Todo }), default: [] }),
+  newTodo: value.string({ default: '' }),
+  completed: value.virtual({
     value: function() {
       return this.todos.filter(todo => todo.complete).length
     },
@@ -20,16 +20,16 @@ const TodoList = model('TodoList', {
 })
 
 const Route = model('Route', {
-  name: props.string(),
-  props: props.mixed(),
+  name: value.string(),
+  props: value.mixed(),
 })
 
 const Store = model('Store', {
-  newListName: props.string({ default: '' }),
-  todoLists: props.array({
-    of: props.ref({ model: TodoList }),
+  newListName: value.string({ default: '' }),
+  todoLists: value.array({
+    of: value.ref({ model: TodoList }),
   }),
-  route: props.ref({ model: Route, default: { name: 'TodoLists' } }),
+  route: value.ref({ model: Route, default: { name: 'TodoLists' } }),
 })
 
 const store = createStore(Store, {
@@ -38,9 +38,11 @@ const store = createStore(Store, {
     console.log('loaded snapshot', snapshot)
     return snapshot
   },
-  onChange: ({ snapshot, js }) => {
-    console.log('onChange', js)
+  onSnapshot: snapshot => {
     localStorage.setItem('snapshot', JSON.stringify(snapshot))
+  },
+  onChange: data => {
+    console.log('change', data)
   },
   actions,
 })
