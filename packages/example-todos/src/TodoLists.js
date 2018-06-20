@@ -5,7 +5,7 @@ class TodoLists extends React.Component {
   componentDidMount() {
     const { store } = this.props
     if (!store.todoLists) {
-      store.fetchTodoLists()
+      store.process('fetchTodoLists')
     }
   }
 

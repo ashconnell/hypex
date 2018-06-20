@@ -1,5 +1,6 @@
 import { model, value, createStore } from 'mobx-quantum'
 import actions from './actions'
+import processes from './processes'
 
 const Todo = model('Todo', {
   id: value.id(),
@@ -45,6 +46,7 @@ const store = createStore(Store, {
     console.log('change', data)
   },
   actions,
+  processes,
 })
 
 export default store

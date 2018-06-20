@@ -4,6 +4,7 @@ import {
   extendObservable,
   computed,
   action,
+  flow,
   configure,
   decorate,
   observable,
@@ -40,11 +41,11 @@ function buildInstance(model, models) {
     _ids = {}
     _instances = {}
 
-    constructor({ store, data, onSnapshot, onChange, actions }) {
+    constructor({ store, data, onSnapshot, onChange, actions, processes }) {
       if (!data) data = {}
       this._isStore = !store
       this._store = store || this
-      if (this._isStore) {
+      if (this._isStore && actions) {
         actions = actions(this)
         extendObservable(
           this,
@@ -55,6 +56,20 @@ function buildInstance(model, models) {
           },
           {
             action: action,
+          }
+        )
+      }
+      if (this._isStore && processes) {
+        processes = processes(this)
+        extendObservable(
+          this,
+          {
+            process: function(name, ...args) {
+              flow(processes[name])(...args)
+            },
+          },
+          {
+            process: action,
           }
         )
       }
@@ -318,7 +333,7 @@ function resolveModelTree(model, models = {}) {
 }
 
 export function createStore(model, options = {}) {
-  let { snapshot, onSnapshot, onChange, actions } = options
+  let { snapshot, onSnapshot, onChange, actions, processes } = options
   if (isFunction(snapshot)) snapshot = snapshot()
   // console.time('[quantum] built models')
   const models = resolveModelTree(model)
@@ -333,6 +348,7 @@ export function createStore(model, options = {}) {
     onSnapshot,
     onChange,
     actions,
+    processes,
   })
   // console.timeEnd('[quantum] built store')
   return store
