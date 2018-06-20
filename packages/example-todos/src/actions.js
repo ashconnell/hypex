@@ -3,17 +3,17 @@ import { delay } from 'mobx-quantum'
 import { flow } from 'mobx'
 import cuid from 'cuid'
 
-const routeTo = store => (name, props) => {
-  store.route = { name, props }
-}
+export default store => ({
+  routeTo(name, props) {
+    store.route = { name, props }
+  },
 
-const toggleTodo = store => id => {
-  const todo = store.get(id)
-  todo.complete = !todo.complete
-}
+  toggleTodo(id) {
+    const todo = store.get(id)
+    todo.complete = !todo.complete
+  },
 
-const fetchTodoLists = store =>
-  flow(function*() {
+  fetchTodoLists: flow(function*() {
     yield delay(500) // simulate async
     store.todoLists = [
       {
@@ -48,46 +48,36 @@ const fetchTodoLists = store =>
       todos,
     })
     console.timeEnd(action)
-  })
+  }),
 
-const createNewList = store => () => {
-  console.log('createNewList')
-  store.todoLists.unshift({
-    id: cuid(),
-    name: store.newListName,
-  })
-  store.newListName = ''
-}
+  createNewList() {
+    console.log('createNewList')
+    store.todoLists.unshift({
+      id: cuid(),
+      name: store.newListName,
+    })
+    store.newListName = ''
+  },
 
-const setNewListName = store => name => {
-  store.newListName = name
-}
+  setNewListName(name) {
+    store.newListName = name
+  },
 
-const setNewTodo = store => (todoListId, text) => {
-  store.get(todoListId).newTodo = text
-}
+  setNewTodo(todoListId, text) {
+    store.get(todoListId).newTodo = text
+  },
 
-const removeTodoList = store => todoListId => {
-  const todoList = store.get(todoListId)
-  store.todoLists.remove(todoList)
-}
+  removeTodoList(todoListId) {
+    const todoList = store.get(todoListId)
+    store.todoLists.remove(todoList)
+  },
 
-const addTodo = store => (todoListId, text) => {
-  const todoList = store.get(todoListId)
-  todoList.todos.unshift({
-    id: cuid(),
-    text: todoList.newTodo,
-  })
-  todoList.newTodo = ''
-}
-
-export default {
-  fetchTodoLists,
-  toggleTodo,
-  routeTo,
-  setNewListName,
-  createNewList,
-  setNewTodo,
-  addTodo,
-  removeTodoList,
-}
+  addTodo(todoListId, text) {
+    const todoList = store.get(todoListId)
+    todoList.todos.unshift({
+      id: cuid(),
+      text: todoList.newTodo,
+    })
+    todoList.newTodo = ''
+  },
+})

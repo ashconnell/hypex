@@ -17,21 +17,23 @@ class TodoLists extends React.Component {
         <form
           onSubmit={e => {
             e.preventDefault()
-            store.createNewList()
+            store.action('createNewList')
           }}
         >
           <input
             type="text"
             placeholder="New List"
             value={store.newListName}
-            onChange={e => store.setNewListName(e.target.value)}
+            onChange={e => store.action('setNewListName', e.target.value)}
           />
         </form>
         {store.todoLists &&
           store.todoLists.map(todoList => (
             <div
               key={todoList.id}
-              onClick={() => store.routeTo('TodoList', { id: todoList.id })}
+              onClick={() =>
+                store.action('routeTo', 'TodoList', { id: todoList.id })
+              }
             >
               <p>
                 <b>{todoList.name} </b>
@@ -39,7 +41,7 @@ class TodoLists extends React.Component {
                 <span
                   onClick={e => {
                     e.stopPropagation()
-                    store.removeTodoList(todoList.id)
+                    store.action('removeTodoList', todoList.id)
                   }}
                 >
                   {' X'}

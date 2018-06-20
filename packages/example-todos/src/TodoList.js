@@ -9,19 +9,21 @@ const TodoList = ({ store, id }) => {
   }
   return (
     <div>
-      <p onClick={() => store.routeTo('TodoLists')}>Back</p>
+      <p onClick={() => store.action('routeTo', 'TodoLists')}>Back</p>
       <h1>{todoList.name}</h1>
       <form
         onSubmit={e => {
           e.preventDefault()
-          store.addTodo(todoList.id, todoList.newTodo)
+          store.action('addTodo', todoList.id, todoList.newTodo)
         }}
       >
         <input
           type="text"
           placeholder="New Todo"
           value={todoList.newTodo}
-          onChange={e => store.setNewTodo(todoList.id, e.target.value)}
+          onChange={e =>
+            store.action('setNewTodo', todoList.id, e.target.value)
+          }
         />
       </form>
       {todoList.todos.map(todo => <Todo key={todo.id} todo={todo} />)}

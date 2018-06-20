@@ -45,17 +45,18 @@ function buildInstance(model, models) {
       this._isStore = !store
       this._store = store || this
       if (this._isStore) {
-        each(actions, (method, name) => {
-          extendObservable(
-            this,
-            {
-              [name]: (...args) => method(this)(...args),
+        actions = actions(this)
+        extendObservable(
+          this,
+          {
+            action: function(name, ...args) {
+              actions[name](...args)
             },
-            {
-              [name]: action,
-            }
-          )
-        })
+          },
+          {
+            action: action,
+          }
+        )
       }
       this.set(data)
       this._store.register(this)
