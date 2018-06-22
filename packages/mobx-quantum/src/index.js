@@ -20,18 +20,6 @@ import config from './config'
 
 configure({ enforceActions: true })
 
-// class Model {
-//   constructor(name, props) {
-//     this.name = name
-//     this.props = props
-//     each(props, (value, prop) => {
-//       if (value.type === Values.ID) {
-//         this.idProp = prop
-//       }
-//     })
-//   }
-// }
-
 function buildInstance(model, models) {
   if (model.Instance) return
   class Instance {
