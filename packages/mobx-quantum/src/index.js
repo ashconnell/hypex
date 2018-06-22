@@ -105,7 +105,7 @@ function buildInstance(model, models) {
           case Types.NUMBER:
           case Types.BOOLEAN:
           case Types.DATE:
-          case Types.MIXED:
+          case Types.OBJECT:
           case Types.ARRAY:
           case Types.REF:
             this[prop] = value
@@ -202,7 +202,7 @@ function buildInstance(model, models) {
       case Types.ENUM:
         decorate(Instance, { [prop]: observable })
         break
-      case Types.MIXED:
+      case Types.OBJECT:
         decorate(Instance, { [prop]: observable })
         break
       case Types.ARRAY:
@@ -284,7 +284,7 @@ function buildInstance(model, models) {
         Object.defineProperty(Instance.prototype, prop, {
           enumerable: true,
           configurable: true,
-          get: type.value,
+          get: type.get,
         })
         decorate(Instance, { [prop]: computed })
         break

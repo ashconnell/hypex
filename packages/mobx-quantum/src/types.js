@@ -2,16 +2,16 @@ import { each, includes } from 'lodash'
 import { invariant } from './utils'
 
 export const Types = {
-  MODEL: 'model',
-  ID: 'id',
   STRING: 'string',
   NUMBER: 'number',
   BOOLEAN: 'boolean',
   DATE: 'date',
   ARRAY: 'array',
+  OBJECT: 'object',
+  MODEL: 'model',
+  ID: 'id',
   ENUM: 'enum',
   REF: 'ref',
-  MIXED: 'mixed',
   VIRTUAL: 'virtual',
 }
 
@@ -20,11 +20,11 @@ class Type {
     this.kind = kind
     this.name = options.name // MODEL
     this.props = options.props // MODEL
-    this.default = options.default // STRING, NUMBER, BOOLEAN, DATE, ENUM, MIXED
+    this.default = options.default // STRING, NUMBER, BOOLEAN, DATE, ENUM, OBJECT
     this.enums = options.enums // ENUM
     this.model = options.model // REF
     this.of = options.of // ARRAY
-    this.value = options.value // VIRTUAL
+    this.get = options.get // VIRTUAL
     if (this.kind === Types.MODEL) {
       each(this.props, (type, prop) => {
         if (type.kind === Types.ID) {

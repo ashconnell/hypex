@@ -28,7 +28,7 @@ const toSnapshot = createTransformer(instance => {
       case Types.BOOLEAN:
       case Types.DATE:
       case Types.ENUM:
-      case Types.MIXED:
+      case Types.OBJECT:
         data[prop] = value
         break
       case Types.ARRAY:
@@ -78,7 +78,7 @@ const toJS = createTransformer(instance => {
       case Types.ENUM:
         data[prop] = value
         break
-      case Types.MIXED:
+      case Types.OBJECT:
         data[prop] = { ...value }
         break
       case Types.ARRAY:

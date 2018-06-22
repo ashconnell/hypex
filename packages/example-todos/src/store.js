@@ -19,7 +19,7 @@ const TodoList = types.model({
     todos: types.array({ of: types.ref({ model: () => Todo }), default: [] }),
     newTodo: types.string({ default: '' }),
     completed: types.virtual({
-      value: function() {
+      get: function() {
         return this.todos.filter(todo => todo.complete).length
       },
     }),
@@ -30,7 +30,7 @@ const Route = types.model({
   name: 'Route',
   props: {
     name: types.string(),
-    props: types.mixed(),
+    props: types.object(),
   },
 })
 
