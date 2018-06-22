@@ -1,22 +1,28 @@
 import { configure } from 'mobx'
-import { model, value, createStore } from '../src'
+import { types, createStore } from '../src'
 
 configure({ enforceActions: false })
 
 test('can create a store with an enum value', () => {
-  const Store = model('Store', {
-    state: value.enum({ enums: ['live', 'draft'] }),
+  const Store = types.model({
+    name: 'Store',
+    props: {
+      state: types.enum({ enums: ['live', 'draft'] }),
+    },
   })
   const store = createStore(Store)
   expect(store).toBeDefined()
 })
 
 test('can set a default value', () => {
-  const Store = model('Store', {
-    state: value.enum({
-      enums: ['live', 'draft'],
-      default: 'live',
-    }),
+  const Store = types.model({
+    name: 'Store',
+    props: {
+      state: types.enum({
+        enums: ['live', 'draft'],
+        default: 'live',
+      }),
+    },
   })
   const store = createStore(Store)
   expect(store.state).toEqual('live')
@@ -24,7 +30,7 @@ test('can set a default value', () => {
 
 test('cant set an invalid default value', () => {
   expect(() => {
-    value.enum({
+    types.enum({
       enums: ['live', 'draft'],
       default: 'published',
     })
@@ -32,11 +38,14 @@ test('cant set an invalid default value', () => {
 })
 
 test('can set a valid enum value', () => {
-  const Store = model('Store', {
-    state: value.enum({
-      enums: ['live', 'draft'],
-      default: 'live',
-    }),
+  const Store = types.model({
+    name: 'Store',
+    props: {
+      state: types.enum({
+        enums: ['live', 'draft'],
+        default: 'live',
+      }),
+    },
   })
   const store = createStore(Store)
   store.state = 'live'
@@ -44,8 +53,11 @@ test('can set a valid enum value', () => {
 })
 
 test('cant set an invalid enum value', () => {
-  const Store = model('Store', {
-    state: value.enum({ enums: ['live', 'draft'] }),
+  const Store = types.model({
+    name: 'Store',
+    props: {
+      state: types.enum({ enums: ['live', 'draft'] }),
+    },
   })
   const store = createStore(Store)
   expect(() => (store.state = 'published')).toThrow()

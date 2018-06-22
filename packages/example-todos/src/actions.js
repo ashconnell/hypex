@@ -1,6 +1,6 @@
 import cuid from 'cuid'
 
-export default store => ({
+const actions = store => ({
   routeTo(name, props) {
     store.route = { name, props }
   },
@@ -41,3 +41,5 @@ export default store => ({
     todoList.newTodo = ''
   },
 })
+
+export default actions

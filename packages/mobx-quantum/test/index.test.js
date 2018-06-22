@@ -1,17 +1,23 @@
 import { configure } from 'mobx'
-import { model, value, createStore } from '../src'
+import { types, createStore } from '../src'
 
 configure({ enforceActions: false })
 
-const Todo = model('Todo', {
-  id: value.id(),
-  name: value.string(),
-  done: value.boolean({ default: false }),
+const Todo = types.model({
+  name: 'Todo',
+  props: {
+    id: types.id(),
+    name: types.string(),
+    done: types.boolean({ default: false }),
+  },
 })
 
-const Store = model('Store', {
-  todoOne: value.ref({ model: Todo }),
-  todoTwo: value.ref({ model: Todo }),
+const Store = types.model({
+  name: 'Store',
+  props: {
+    todoOne: types.ref({ model: Todo }),
+    todoTwo: types.ref({ model: Todo }),
+  },
 })
 
 function newStore(snapshot) {

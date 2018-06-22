@@ -1,7 +1,7 @@
 import { each } from 'lodash'
 import { values } from 'mobx'
-import { Values } from './value'
 import { createTransformer } from 'mobx-utils'
+import { Types } from './types'
 
 /**
  * toSnapshot outputs a normalized data snapshot
@@ -18,30 +18,30 @@ const toSnapshot = createTransformer(instance => {
     data._type = instance._model.name
     data._id = instance._id
   }
-  each(instance._model.props, (value, prop) => {
-    const val = instance[prop]
-    if (!val) return
-    switch (value.type) {
-      case Values.ID:
-      case Values.STRING:
-      case Values.NUMBER:
-      case Values.BOOLEAN:
-      case Values.DATE:
-      case Values.ENUM:
-      case Values.MIXED:
-        data[prop] = val
+  each(instance._model.props, (type, prop) => {
+    const value = instance[prop]
+    if (!value) return
+    switch (type.kind) {
+      case Types.ID:
+      case Types.STRING:
+      case Types.NUMBER:
+      case Types.BOOLEAN:
+      case Types.DATE:
+      case Types.ENUM:
+      case Types.MIXED:
+        data[prop] = value
         break
-      case Values.ARRAY:
-        if (value.of.type === Values.REF) {
+      case Types.ARRAY:
+        if (type.of.kind === Types.REF) {
           data[prop] = values(instance._ids[prop])
         } else {
-          data[prop] = values(val)
+          data[prop] = values(value)
         }
         break
-      case Values.REF:
+      case Types.REF:
         data[prop] = instance._ids[prop]
         break
-      case Values.VIRTUAL:
+      case Types.VIRTUAL:
         break
       default:
         break
@@ -66,34 +66,34 @@ const toSnapshot = createTransformer(instance => {
  */
 const toJS = createTransformer(instance => {
   let data = {}
-  each(instance._model.props, (value, prop) => {
-    const val = instance[prop]
-    if (!val) return
-    switch (value.type) {
-      case Values.ID:
-      case Values.STRING:
-      case Values.NUMBER:
-      case Values.BOOLEAN:
-      case Values.DATE:
-      case Values.ENUM:
-        data[prop] = val
+  each(instance._model.props, (type, prop) => {
+    const value = instance[prop]
+    if (!value) return
+    switch (type.kind) {
+      case Types.ID:
+      case Types.STRING:
+      case Types.NUMBER:
+      case Types.BOOLEAN:
+      case Types.DATE:
+      case Types.ENUM:
+        data[prop] = value
         break
-      case Values.MIXED:
-        data[prop] = { ...val }
+      case Types.MIXED:
+        data[prop] = { ...value }
         break
-      case Values.ARRAY:
-        if (value.of.type === Values.REF) {
+      case Types.ARRAY:
+        if (type.of.kind === Types.REF) {
           data[prop] = instance._ids[prop].map(id =>
             toJS(instance._store.get(id))
           )
         } else {
-          data[prop] = values(val)
+          data[prop] = values(value)
         }
         break
-      case Values.REF:
+      case Types.REF:
         data[prop] = toJS(instance._store.get(instance._ids[prop]))
         break
-      case Values.VIRTUAL:
+      case Types.VIRTUAL:
         break
       default:
         break

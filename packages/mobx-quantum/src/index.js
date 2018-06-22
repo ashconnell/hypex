@@ -11,26 +11,26 @@ import {
 } from 'mobx'
 import { each, isString, isNumber, isFunction, includes } from 'lodash'
 import cuid from 'cuid'
-import { Values } from './value'
+import { Types } from './types'
 import { toSnapshot, toJS } from './serializers'
-export { default as value } from './value'
+export { default as types } from './types'
 export * from './effects'
 import { invariant } from './utils'
 import config from './config'
 
 configure({ enforceActions: true })
 
-class Model {
-  constructor(name, props) {
-    this.name = name
-    this.props = props
-    each(props, (value, prop) => {
-      if (value.type === Values.ID) {
-        this.idProp = prop
-      }
-    })
-  }
-}
+// class Model {
+//   constructor(name, props) {
+//     this.name = name
+//     this.props = props
+//     each(props, (value, prop) => {
+//       if (value.type === Values.ID) {
+//         this.idProp = prop
+//       }
+//     })
+//   }
+// }
 
 function buildInstance(model, models) {
   if (model.Instance) return
@@ -99,42 +99,42 @@ function buildInstance(model, models) {
           this._instances[instance._id] = instance
         })
       }
-      each(this._model.props, (value, prop) => {
-        const defaultVal = isFunction(value.default)
-          ? value.default()
-          : value.default
-        const val = data[prop] || defaultVal
+      each(this._model.props, (type, prop) => {
+        const defaultValue = isFunction(type.default)
+          ? type.default()
+          : type.default
+        const value = data[prop] || defaultValue
         if (this._interceptors[prop]) this._interceptors[prop]()
-        switch (value.type) {
-          case Values.ID:
+        switch (type.kind) {
+          case Types.ID:
             this._interceptors[prop] = intercept(this, prop, change => {
               this._id = change.newValue || cuid.slug()
               return change
             })
-            this[prop] = val
+            this[prop] = value
             break
-          case Values.STRING:
-          case Values.NUMBER:
-          case Values.BOOLEAN:
-          case Values.DATE:
-          case Values.MIXED:
-          case Values.ARRAY:
-          case Values.REF:
-            this[prop] = val
+          case Types.STRING:
+          case Types.NUMBER:
+          case Types.BOOLEAN:
+          case Types.DATE:
+          case Types.MIXED:
+          case Types.ARRAY:
+          case Types.REF:
+            this[prop] = value
             break
-          case Values.ENUM:
+          case Types.ENUM:
             if (!config.prod) {
               this._interceptors[prop] = intercept(this, prop, change => {
                 invariant(
-                  change.newValue && includes(value.enums, change.newValue),
+                  change.newValue && includes(type.enums, change.newValue),
                   `received enum '${
                     change.newValue
-                  }' but expected one of: ${value.enums.join(', ')}`
+                  }' but expected one of: ${type.enums.join(', ')}`
                 )
                 return change
               })
             }
-            this[prop] = val
+            this[prop] = value
             break
           default:
             break
@@ -204,20 +204,20 @@ function buildInstance(model, models) {
     _instances: observable,
   })
   model.Instance = Instance
-  each(model.props, (value, prop) => {
-    switch (value.type) {
-      case Values.ID:
-      case Values.STRING:
-      case Values.NUMBER:
-      case Values.BOOLEAN:
-      case Values.DATE:
-      case Values.ENUM:
+  each(model.props, (type, prop) => {
+    switch (type.kind) {
+      case Types.ID:
+      case Types.STRING:
+      case Types.NUMBER:
+      case Types.BOOLEAN:
+      case Types.DATE:
+      case Types.ENUM:
         decorate(Instance, { [prop]: observable })
         break
-      case Values.MIXED:
+      case Types.MIXED:
         decorate(Instance, { [prop]: observable })
         break
-      case Values.ARRAY:
+      case Types.ARRAY:
         Object.defineProperty(Instance.prototype, prop, {
           enumerable: true,
           configurable: true,
@@ -233,7 +233,7 @@ function buildInstance(model, models) {
               this._ids[prop] = null
             } else {
               let ids = data.map(child => {
-                return this.resolveId(value.of.model, child)
+                return this.resolveId(type.of.model, child)
               })
               this._ids[prop] = ids
             }
@@ -249,7 +249,7 @@ function buildInstance(model, models) {
               switch (change.type) {
                 case 'splice':
                   const ids = change.added.map(data => {
-                    return this.resolveId(value.of.model, data)
+                    return this.resolveId(type.of.model, data)
                   })
                   this._ids[prop].splice(
                     change.index,
@@ -267,7 +267,7 @@ function buildInstance(model, models) {
         })
         decorate(Instance, { [prop]: computed })
         break
-      case Values.REF:
+      case Types.REF:
         Object.defineProperty(Instance.prototype, prop, {
           enumerable: true,
           configurable: true,
@@ -281,7 +281,7 @@ function buildInstance(model, models) {
             if (!data) {
               this._ids[prop] = null
             } else {
-              const id = this.resolveId(value.model, data)
+              const id = this.resolveId(type.model, data)
               this._ids[prop] = id
             }
           },
@@ -292,11 +292,11 @@ function buildInstance(model, models) {
         })
         decorate(Instance, { [prop]: computed })
         break
-      case Values.VIRTUAL:
+      case Types.VIRTUAL:
         Object.defineProperty(Instance.prototype, prop, {
           enumerable: true,
           configurable: true,
-          get: value.value,
+          get: type.value,
         })
         decorate(Instance, { [prop]: computed })
         break
@@ -321,18 +321,19 @@ function resolveModelTree(model, models = {}) {
   // pre-register
   models[model.name] = model
   // register child schemas
-  each(model.props, (value, prop) => {
-    if (value.type === Values.REF) {
-      resolveModelTree(value.model, models)
+  each(model.props, (type, prop) => {
+    if (type.kind === Types.REF) {
+      resolveModelTree(type.model, models)
     }
-    if (value.type === Values.ARRAY && value.of.type === Values.REF) {
-      resolveModelTree(value.of.model, models)
+    if (type.kind === Types.ARRAY && type.of.kind === Types.REF) {
+      resolveModelTree(type.of.model, models)
     }
   })
   return models
 }
 
 export function createStore(model, options = {}) {
+  invariant(model.kind === Types.MODEL, 'createStore root type must be model')
   let { snapshot, onSnapshot, onChange, actions, processes } = options
   if (isFunction(snapshot)) snapshot = snapshot()
   // console.time('[quantum] built models')
@@ -352,8 +353,4 @@ export function createStore(model, options = {}) {
   })
   // console.timeEnd('[quantum] built store')
   return store
-}
-
-export function model(name, props) {
-  return new Model(name, props)
 }

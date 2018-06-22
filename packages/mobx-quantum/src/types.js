@@ -1,7 +1,8 @@
 import { each, includes } from 'lodash'
 import { invariant } from './utils'
 
-export const Values = {
+export const Types = {
+  MODEL: 'model',
   ID: 'id',
   STRING: 'string',
   NUMBER: 'number',
@@ -14,18 +15,27 @@ export const Values = {
   VIRTUAL: 'virtual',
 }
 
-class Value {
-  constructor(type, options = {}) {
-    this.type = type
+class Type {
+  constructor(kind, options = {}) {
+    this.kind = kind
+    this.name = options.name // MODEL
+    this.props = options.props // MODEL
     this.default = options.default // STRING, NUMBER, BOOLEAN, DATE, ENUM, MIXED
     this.enums = options.enums // ENUM
     this.model = options.model // REF
     this.of = options.of // ARRAY
     this.value = options.value // VIRTUAL
+    if (this.kind === Types.MODEL) {
+      each(this.props, (type, prop) => {
+        if (type.kind === Types.ID) {
+          this.idProp = prop
+        }
+      })
+    }
     this.validate()
   }
   validate() {
-    if (this.type === Values.ENUM) {
+    if (this.kind === Types.ENUM) {
       invariant(
         this.default && includes(this.enums, this.default),
         'enum default value must be one of the enums specified'
@@ -34,10 +44,10 @@ class Value {
   }
 }
 
-const value = {}
+const types = {}
 
-each(Values, type => {
-  value[type] = options => new Value(type, options)
+each(Types, kind => {
+  types[kind] = options => new Type(kind, options)
 })
 
-export default value
+export default types

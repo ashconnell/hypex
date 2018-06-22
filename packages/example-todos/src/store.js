@@ -1,36 +1,48 @@
-import { model, value, createStore } from 'mobx-quantum'
+import { types, createStore } from 'mobx-quantum'
 import actions from './actions'
 import processes from './processes'
 
-const Todo = model('Todo', {
-  id: value.id(),
-  text: value.string(),
-  complete: value.boolean({ default: false }),
+const Todo = types.model({
+  name: 'Todo',
+  props: {
+    id: types.id(),
+    text: types.string(),
+    complete: types.boolean({ default: false }),
+  },
 })
 
-const TodoList = model('TodoList', {
-  id: value.id(),
-  name: value.string(),
-  todos: value.array({ of: value.ref({ model: () => Todo }), default: [] }),
-  newTodo: value.string({ default: '' }),
-  completed: value.virtual({
-    value: function() {
-      return this.todos.filter(todo => todo.complete).length
-    },
-  }),
+const TodoList = types.model({
+  name: 'TodoList',
+  props: {
+    id: types.id(),
+    name: types.string(),
+    todos: types.array({ of: types.ref({ model: () => Todo }), default: [] }),
+    newTodo: types.string({ default: '' }),
+    completed: types.virtual({
+      value: function() {
+        return this.todos.filter(todo => todo.complete).length
+      },
+    }),
+  },
 })
 
-const Route = model('Route', {
-  name: value.string(),
-  props: value.mixed(),
+const Route = types.model({
+  name: 'Route',
+  props: {
+    name: types.string(),
+    props: types.mixed(),
+  },
 })
 
-const Store = model('Store', {
-  newListName: value.string({ default: '' }),
-  todoLists: value.array({
-    of: value.ref({ model: TodoList }),
-  }),
-  route: value.ref({ model: Route, default: { name: 'TodoLists' } }),
+const Store = types.model({
+  name: 'Store',
+  props: {
+    newListName: types.string({ default: '' }),
+    todoLists: types.array({
+      of: types.ref({ model: TodoList }),
+    }),
+    route: types.ref({ model: Route, default: { name: 'TodoLists' } }),
+  },
 })
 
 const store = createStore(Store, {
