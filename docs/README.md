@@ -2,9 +2,8 @@
 
 * [Read Me](../README.md)
 * [Quick Start](quick-start.md)
-* [Models](models.md)
-* [Values](values.md)
-* [Store](store.md)
+* [Types](values.md)
+* [State](store.md)
 * [React Integration](react-integration.md)
 * [Examples](examples.md)
 

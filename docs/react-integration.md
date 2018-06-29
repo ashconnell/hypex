@@ -11,10 +11,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'mobx-react'
 import Todos from './Todos';
-import store from './store'
+import state from './state'
 
 const App = () => (
-  <Provider store={store}>
+  <Provider state={state}>
     <Todos/>
   </Provider>
 )
@@ -31,17 +31,17 @@ ReactDOM.render(<App />, document.getElementById('root'));
 ```javascript
 import { inject, observe } from 'mobx-react'
 
-const Todos = (store) => (
+const Todos = (state) => (
   <h1>Todos</h1>
-  <form onSubmit={(e) => { e.preventDefault(); store.addTodo(this.text) }}>
+  <form onSubmit={(e) => { e.preventDefault(); state.addTodo(this.text) }}>
     <input type='text' placeholder='Add todo' onChange={(e) => this.text = e.target.value}/>
   </form>
-  {store.todos.map(todo => {
+  {state.todos.map(todo => {
     <p>{todo.text}</p>
   })}
 )
 
-export default inject('store')(observer(Todos))
+export default inject('state')(observer(Todos))
 ```
 {% endcode-tabs-item %}
 {% endcode-tabs %}
