@@ -8,37 +8,43 @@ You can also jump straight into playing around with a live example on [this code
 
 ## 1. Install Dependencies
 
-`yarn add mobx-quantum mobx-react mobx react react-dom`
+`yarn add hypex mobx-react mobx react react-dom`
 
 ## 2. Define the store
 
 ```javascript
-// store.js
-import { model, value, createStore } from 'mobx-quantum'
+// state.js
+import { types, createState } from 'hypex'
 import actions from './actions'
 
-const Todo = model('Todo', {
-  text: value.string(),
-  done: value.boolean({ default: false })
+const Todo = types.model({
+  name: 'Todo', 
+  props: {
+    text: types.string(),
+    done: types.boolean({ default: false })
+  }
 })
 
-const Store = model('Store', {
-  todos: value.array({ of: value.ref({ model: Todo }), default: [] })
+const App = types.model({
+  name: 'App', 
+  props: {
+    todos: types.array({ of: types.ref({ model: Todo }), default: [] })
+  }
 })
 
-export default createStore(Store, {
+export default createState(App, {
   actions,
   snapshot: JSON.parse(localStorage.getItem('snapshot') || '{}'),
   onSnapshot: snapshot => localStorage.setItem('snapshot', JSON.parse(snapshot))
 })
 ```
 
-## 3. Define some actions for the store
+## 3. Define some actions for your state
 
 ```javascript
 // actions.js
-function addTodo (text) {
-  this.todos.push({ text })
+function addTodo (state, text) {
+  state.todos.push({ text })
 }
 export default { addTodo }
 ```
@@ -49,17 +55,17 @@ export default { addTodo }
 // Todos.js
 import { inject, observe } from 'mobx-react'
 
-const Todos = ({ store }) => (
+const Todos = ({ state }) => (
   <h1>Todos</h1>
-  <form onSubmit={(e) => { e.preventDefault(); store.addTodo(this.text) }}>
+  <form onSubmit={(e) => { e.preventDefault(); state.action('addTodo', this.text) }}>
     <input type='text' placeholder='Add todo' onChange={(e) => this.text = e.target.value}/>
   </form>
-  {store.todos.map(todo => {
+  {state.todos.map(todo => {
     <p>{todo.text}</p>
   })}
 )
 
-export default inject('store')(observer(Todos))
+export default inject('state')(observer(Todos))
 ```
 
 ## 5. Initialize the React app
@@ -70,10 +76,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'mobx-react'
 import Todos from './Todos';
-import store from './store'
+import state from './state'
 
 const App = () => (
-  <Provider store={store}>
+  <Provider state={state}>
     <Todos/>
   </Provider>
 )
