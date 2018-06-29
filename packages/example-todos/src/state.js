@@ -1,6 +1,5 @@
-import { types, createStore } from 'mobx-quantum'
+import { types, createState } from 'hypex'
 import actions from './actions'
-import processes from './processes'
 
 const Todo = types.model({
   name: 'Todo',
@@ -34,8 +33,8 @@ const Route = types.model({
   },
 })
 
-const Store = types.model({
-  name: 'Store',
+const App = types.model({
+  name: 'App',
   props: {
     newListName: types.string({ default: '' }),
     todoLists: types.array({
@@ -45,7 +44,7 @@ const Store = types.model({
   },
 })
 
-const store = createStore(Store, {
+const state = createState(App, {
   snapshot() {
     const snapshot = JSON.parse(localStorage.getItem('snapshot') || '{}')
     console.log('loaded snapshot', snapshot)
@@ -58,7 +57,6 @@ const store = createStore(Store, {
     console.log('change', data)
   },
   actions,
-  processes,
 })
 
-export default store
+export default state

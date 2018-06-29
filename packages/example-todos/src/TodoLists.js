@@ -3,36 +3,36 @@ import { inject, observer } from 'mobx-react'
 
 class TodoLists extends React.Component {
   componentDidMount() {
-    const { store } = this.props
-    if (!store.todoLists) {
-      store.process('fetchTodoLists')
+    const { state } = this.props
+    if (!state.todoLists) {
+      state.action('fetchTodoLists')
     }
   }
 
   render() {
-    const { store } = this.props
+    const { state } = this.props
     return (
       <div>
         <h1>Lists</h1>
         <form
           onSubmit={e => {
             e.preventDefault()
-            store.action('createNewList')
+            state.action('createNewList')
           }}
         >
           <input
             type="text"
             placeholder="New List"
-            value={store.newListName}
-            onChange={e => store.action('setNewListName', e.target.value)}
+            value={state.newListName}
+            onChange={e => state.action('setNewListName', e.target.value)}
           />
         </form>
-        {store.todoLists &&
-          store.todoLists.map(todoList => (
+        {state.todoLists &&
+          state.todoLists.map(todoList => (
             <div
               key={todoList.id}
               onClick={() =>
-                store.action('routeTo', 'TodoList', { id: todoList.id })
+                state.action('routeTo', 'TodoList', { id: todoList.id })
               }
             >
               <p>
@@ -41,7 +41,7 @@ class TodoLists extends React.Component {
                 <span
                   onClick={e => {
                     e.stopPropagation()
-                    store.action('removeTodoList', todoList.id)
+                    state.action('removeTodoList', todoList.id)
                   }}
                 >
                   {' X'}
@@ -54,4 +54,4 @@ class TodoLists extends React.Component {
   }
 }
 
-export default inject('store')(observer(TodoLists))
+export default inject('state')(observer(TodoLists))

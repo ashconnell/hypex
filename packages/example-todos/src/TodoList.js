@@ -2,19 +2,19 @@ import React from 'react'
 import { inject, observer } from 'mobx-react'
 import Todo from './Todo'
 
-const TodoList = ({ store, id }) => {
-  const todoList = store.get(id)
+const TodoList = ({ state, id }) => {
+  const todoList = state.get(id)
   if (!todoList) {
     return <p>No Todo List</p>
   }
   return (
     <div>
-      <p onClick={() => store.action('routeTo', 'TodoLists')}>Back</p>
+      <p onClick={() => state.action('routeTo', 'TodoLists')}>Back</p>
       <h1>{todoList.name}</h1>
       <form
         onSubmit={e => {
           e.preventDefault()
-          store.action('addTodo', todoList.id, todoList.newTodo)
+          state.action('addTodo', todoList.id, todoList.newTodo)
         }}
       >
         <input
@@ -22,7 +22,7 @@ const TodoList = ({ store, id }) => {
           placeholder="New Todo"
           value={todoList.newTodo}
           onChange={e =>
-            store.action('setNewTodo', todoList.id, e.target.value)
+            state.action('setNewTodo', todoList.id, e.target.value)
           }
         />
       </form>
@@ -31,4 +31,4 @@ const TodoList = ({ store, id }) => {
   )
 }
 
-export default inject('store')(observer(TodoList))
+export default inject('state')(observer(TodoList))

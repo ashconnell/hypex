@@ -5,8 +5,8 @@ export default {
   entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'mobx-quantum.js',
-    library: 'mobxQuantum',
+    filename: 'hypex.js',
+    library: 'hypex',
     libraryTarget: 'umd',
   },
   externals: {

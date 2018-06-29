@@ -3,10 +3,10 @@ import ReactDOM from 'react-dom'
 import { Provider } from 'mobx-react'
 
 import Router from './Router'
-import store from './store'
+import state from './state'
 
 const App = () => (
-  <Provider store={store}>
+  <Provider state={state}>
     <Router />
   </Provider>
 )

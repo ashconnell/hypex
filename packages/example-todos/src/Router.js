@@ -8,10 +8,10 @@ const components = {
   TodoList: TodoList,
 }
 
-const Router = ({ store }) => {
-  if (!store.route) return null
-  const Route = components[store.route.name]
-  return <Route {...store.route.props} />
+const Router = ({ state }) => {
+  if (!state.route) return null
+  const Route = components[state.route.name]
+  return <Route {...state.route.props} />
 }
 
-export default inject('store')(observer(Router))
+export default inject('state')(observer(Router))

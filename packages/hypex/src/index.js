@@ -29,35 +29,20 @@ function buildInstance(model, models) {
     _ids = {}
     _instances = {}
 
-    constructor({ store, data, onSnapshot, onChange, actions, processes }) {
+    constructor({ store, data, onSnapshot, onChange, actions }) {
       if (!data) data = {}
       this._isStore = !store
       this._store = store || this
       if (this._isStore && actions) {
-        actions = actions(this)
         extendObservable(
           this,
           {
-            action: function(name, ...args) {
-              actions[name](...args)
+            action: (name, ...args) => {
+              actions[name](this, ...args)
             },
           },
           {
             action: action,
-          }
-        )
-      }
-      if (this._isStore && processes) {
-        processes = processes(this)
-        extendObservable(
-          this,
-          {
-            process: function(name, ...args) {
-              flow(processes[name])(...args)
-            },
-          },
-          {
-            process: action,
           }
         )
       }
@@ -320,25 +305,24 @@ function resolveModelTree(model, models = {}) {
   return models
 }
 
-export function createStore(model, options = {}) {
-  invariant(model.kind === Types.MODEL, 'createStore root type must be model')
-  let { snapshot, onSnapshot, onChange, actions, processes } = options
+export function createState(model, options = {}) {
+  invariant(model.kind === Types.MODEL, 'createState root type must be model')
+  let { snapshot, onSnapshot, onChange, actions } = options
   if (isFunction(snapshot)) snapshot = snapshot()
-  // console.time('[quantum] built models')
+  // console.time('[hypex] built models')
   const models = resolveModelTree(model)
-  // console.timeEnd('[quantum] built models')
-  // console.time('[quantum] built models')
+  // console.timeEnd('[hypex] built models')
+  // console.time('[hypex] built models')
   each(models, model => buildInstance(model, models))
-  // console.timeEnd('[quantum] built models')
+  // console.timeEnd('[hypex] built models')
   // console.log({ models })
-  // console.time('[quantum] built store')
-  const store = new model.Instance({
+  // console.time('[hypex] built state')
+  const state = new model.Instance({
     data: snapshot,
     onSnapshot,
     onChange,
     actions,
-    processes,
   })
-  // console.timeEnd('[quantum] built store')
-  return store
+  // console.timeEnd('[hypex] built state')
+  return state
 }

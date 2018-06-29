@@ -1,22 +1,22 @@
 import { configure } from 'mobx'
-import { types, createStore } from '../src'
+import { types, createState } from '../src'
 
 configure({ enforceActions: false })
 
-test('can create a store with an enum value', () => {
-  const Store = types.model({
-    name: 'Store',
+test('can create a state with an enum value', () => {
+  const State = types.model({
+    name: 'State',
     props: {
       state: types.enum({ enums: ['live', 'draft'] }),
     },
   })
-  const store = createStore(Store)
-  expect(store).toBeDefined()
+  const state = createState(State)
+  expect(state).toBeDefined()
 })
 
 test('can set a default value', () => {
-  const Store = types.model({
-    name: 'Store',
+  const State = types.model({
+    name: 'State',
     props: {
       state: types.enum({
         enums: ['live', 'draft'],
@@ -24,8 +24,8 @@ test('can set a default value', () => {
       }),
     },
   })
-  const store = createStore(Store)
-  expect(store.state).toEqual('live')
+  const state = createState(State)
+  expect(state.state).toEqual('live')
 })
 
 test('cant set an invalid default value', () => {
@@ -38,8 +38,8 @@ test('cant set an invalid default value', () => {
 })
 
 test('can set a valid enum value', () => {
-  const Store = types.model({
-    name: 'Store',
+  const State = types.model({
+    name: 'State',
     props: {
       state: types.enum({
         enums: ['live', 'draft'],
@@ -47,18 +47,18 @@ test('can set a valid enum value', () => {
       }),
     },
   })
-  const store = createStore(Store)
-  store.state = 'live'
-  expect(store.state).toEqual('live')
+  const state = createState(State)
+  state.state = 'live'
+  expect(state.state).toEqual('live')
 })
 
 test('cant set an invalid enum value', () => {
-  const Store = types.model({
-    name: 'Store',
+  const State = types.model({
+    name: 'State',
     props: {
       state: types.enum({ enums: ['live', 'draft'] }),
     },
   })
-  const store = createStore(Store)
-  expect(() => (store.state = 'published')).toThrow()
+  const state = createState(State)
+  expect(() => (state.state = 'published')).toThrow()
 })

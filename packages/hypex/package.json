@@ -1,8 +1,8 @@
 {
-  "name": "mobx-quantum",
+  "name": "hypex",
   "version": "1.2.0",
-  "main": "dist/mobx-quantum.js",
-  "module": "lib/mobx-quantum.module.js",
+  "main": "dist/hypex.js",
+  "module": "dist/hypex.module.js",
   "license": "MIT",
   "sideEffects": false,
   "scripts": {
